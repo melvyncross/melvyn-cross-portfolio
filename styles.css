@@ -33,59 +33,61 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* ============== DARK MODE TOKENS ============== */
+/* ============== DARK MODE ============== */
+/*
+ * Strategy: flip --ink to a light colour so every element using
+ * color:var(--ink) becomes readable automatically. Do NOT change
+ * --cream — it is used as text colour on the navy sections (number,
+ * built, bring) and must stay light. Instead, override section
+ * backgrounds directly with hardcoded dark values.
+ */
 [data-theme="dark"] {
-  --cream: #171614;
-  --cream-deep: #1e1c1a;
-  --amber: #4f98a3;
+  --ink: #e4e2dd;           /* was navy → now warm off-white for text */
+  --ink-mute: #7a7876;      /* muted text on dark surfaces */
+  --amber: #4f98a3;         /* teal accent replaces amber */
   --amber-deep: #3d7a83;
-  --paper-text: #cdccca;
+  --paper-text: #cdccca;    /* body text on dark cream surfaces */
   --paper-mute: #7a7876;
   --ink-text: #cdccca;
   --rule: rgba(205, 204, 202, 0.12);
   --rule-ink: rgba(205, 204, 202, 0.15);
 }
 
-/* ── Dark mode: fix elements using color:var(--ink) on now-dark surfaces ── */
-/* --ink (#0A1628 navy) is used for both dark BG sections AND as text on    */
-/* cream sections. In dark mode cream→#171614, so ink-on-dark is invisible. */
-[data-theme="dark"] .beginning__title,
-[data-theme="dark"] .beginning__chapter-name,
-[data-theme="dark"] .deals__title,
-[data-theme="dark"] .deal__index,
-[data-theme="dark"] .deal__figure,
-[data-theme="dark"] .deal__story h3,
-[data-theme="dark"] .fasep__title,
-[data-theme="dark"] .fasep__text .lead,
-[data-theme="dark"] .contact__cta,
-[data-theme="dark"] .contact__link,
-[data-theme="dark"] .contact__arrow { color: var(--ink-text); }
+/* ── Formerly-cream sections: explicit dark backgrounds ── */
+[data-theme="dark"] body    { background: #171614; }
+[data-theme="dark"] .beginning { background: #171614; }
+[data-theme="dark"] .deals     { background: #171614; }
+[data-theme="dark"] .fasep  { background: linear-gradient(180deg, #171614 0%, #1e1c1a 100%); }
+[data-theme="dark"] .contact   { background: #171614; }
 
-/* stat__label uses color:var(--cream) on navy bg — cream is now dark */
-[data-theme="dark"] .stat__label { color: var(--ink-mute); }
-
-/* number section gradient hardcodes amber end — override in dark mode */
+/* ── Formerly-navy sections: re-lock backgrounds (--ink is now light) ── */
+[data-theme="dark"] .hero   { background: #0A1628; }
+[data-theme="dark"] .built  { background: #0A1628; }
+[data-theme="dark"] .stat   { background: #0A1628; }
+[data-theme="dark"] .stat:hover { background: #1a2942; transform: translateY(-6px) scale(1.01); }
+[data-theme="dark"] .bring  { background: #0A1628; }
+[data-theme="dark"] .foot   { background: #0A1628; }
 [data-theme="dark"] .number {
   background: linear-gradient(180deg, #0A1628 0%, #1a2942 50%, #3d7a83 100%);
 }
 
-/* highlight underlines on strong text use hardcoded amber rgba */
+/* ── Interactive element fills ── */
+[data-theme="dark"] .contact__link::before  { background: #1a2942; }
+[data-theme="dark"] .contact__cv:hover      { background-color: #1a2942; }
+[data-theme="dark"] .contact__link:hover .contact__value { color: var(--cream); }
+
+/* ── Highlight underlines (hardcoded amber rgba → teal) ── */
 [data-theme="dark"] .beginning__body strong {
-  color: var(--ink-text);
-  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.3) 60%);
+  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.28) 60%);
 }
 [data-theme="dark"] .fasep__text strong {
-  color: var(--ink-text);
-  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.35) 60%);
+  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.32) 60%);
 }
 
-/* SVG node labels in FASEP map */
-[data-theme="dark"] .fasep__node text { fill: var(--ink-text); }
-[data-theme="dark"] .fasep__node--origin text { fill: var(--paper-mute); }
-
-/* contact link hover: dark bg fill stays visible */
-[data-theme="dark"] .contact__link::before { background: var(--ink-soft); }
-[data-theme="dark"] .contact__link:hover .contact__value { color: var(--ink-text); }
+/* ── SVG fills in FASEP map ── */
+[data-theme="dark"] .fasep__node text       { fill: #e4e2dd; }
+[data-theme="dark"] .fasep__node--origin text { fill: #7a7876; }
+[data-theme="dark"] .fasep__arc { stroke: var(--amber-deep); }
 
 /* ============== RESET ============== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1229,11 +1231,16 @@ em { font-style: italic; }
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  /* generous room for Fraunces display ascenders + descenders */
-  padding-top: 0.12em;
-  margin-top: -0.12em;
-  padding-bottom: 0.22em;
-  margin-bottom: -0.22em;
+  /*
+   * Fraunces display italic has extreme optical extents at large sizes.
+   * The negative margin trick keeps line-spacing intact while the padding
+   * expands the clip box so no ink is ever cut. Values are intentionally
+   * generous — 0.3em top (swash ascenders), 0.45em bottom (descenders).
+   */
+  padding-top: 0.3em;
+  margin-top: -0.3em;
+  padding-bottom: 0.45em;
+  margin-bottom: -0.45em;
 }
 .reveal-word__inner {
   display: inline-block;
