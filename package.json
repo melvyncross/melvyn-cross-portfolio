@@ -1,0 +1,12 @@
+{
+  "name": "melvyn-cross-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch-content.js"
+  },
+  "dependencies": {
+    "@sanity/client": "^6"
+  }
+}
