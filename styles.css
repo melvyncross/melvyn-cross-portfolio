@@ -841,6 +841,210 @@ em { font-style: italic; }
   font-variation-settings: "opsz" 14;
 }
 
+/* ============== PROGRESS BAR ============== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+  z-index: 999;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ============== CUSTOM CURSOR ============== */
+.cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: var(--amber);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  top: 0; left: 0;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease-out),
+              height 0.3s var(--ease-out),
+              background 0.3s var(--ease-out),
+              opacity 0.3s ease;
+  will-change: transform;
+  mix-blend-mode: normal;
+}
+.cursor--large {
+  width: 36px; height: 36px;
+  background: transparent;
+  border: 1.5px solid var(--amber);
+}
+.cursor--hidden { opacity: 0; }
+
+/* Hide cursor on touch devices */
+@media (pointer: coarse) {
+  .cursor { display: none; }
+}
+
+/* ============== NAV LANG TOGGLE ============== */
+.nav__lang {
+  background: none;
+  border: none;
+  cursor: none;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: inherit;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid currentColor;
+  line-height: 1;
+  pointer-events: auto;
+  transition: opacity 0.2s ease;
+  opacity: 0.6;
+}
+.nav__lang:hover { opacity: 1; }
+
+/* ============== HERO LAYOUT (with portrait) ============== */
+.hero__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  padding-top: 2rem;
+}
+.hero__left {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Portrait slot */
+.hero__portrait {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-height: 72vh;
+  overflow: hidden;
+  border: 1px solid var(--rule-ink);
+  opacity: 0;
+  animation: fade-in 1s var(--ease-out) 0.8s forwards;
+}
+.hero__portrait-img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.hero__portrait-placeholder {
+  position: absolute; inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(255,255,255,0.03);
+}
+.hero__portrait-img[style*="display: none"] + .hero__portrait-placeholder,
+.hero__portrait-img.errored + .hero__portrait-placeholder {
+  display: flex;
+}
+.hero__portrait-inner {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1rem;
+}
+.hero__portrait-icon {
+  font-size: 2.5rem;
+  color: var(--ink-mute);
+  opacity: 0.4;
+}
+.hero__portrait-hint {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  opacity: 0.5;
+}
+
+/* Portrait: show placeholder by default, hide if image loads */
+.hero__portrait-img { display: block; }
+.hero__portrait-placeholder { display: none; }
+
+@media (max-width: 900px) {
+  .hero__content {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .hero__portrait {
+    aspect-ratio: 4 / 3;
+    max-height: 50vw;
+    order: -1;
+  }
+}
+
+/* ============== MARQUEE ============== */
+.marquee {
+  position: absolute;
+  bottom: 5.5rem;
+  left: 0; right: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+.marquee__content {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  padding: 0.6rem 0;
+}
+.marquee__item {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding: 0 2rem;
+}
+.marquee__sep {
+  color: var(--amber);
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============== TEXT REVEAL (scroll-triggered word mask) ============== */
+.reveal-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* small breathing room so descenders don't clip */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.reveal-word__inner {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.85s var(--ease-out);
+}
+/* Stagger via CSS custom property set by JS */
+.reveal-word__inner {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+/* Trigger: parent section gets is-revealed */
+.is-revealed .reveal-word__inner {
+  transform: translateY(0);
+}
+
 /* ============== REVEAL ANIMATION ============== */
 [data-reveal] { opacity: 0; transform: translateY(30px); transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out); }
 [data-reveal].is-revealed { opacity: 1; transform: translateY(0); }
@@ -880,4 +1084,7 @@ em { font-style: italic; }
   }
   [data-reveal] { opacity: 1; transform: none; }
   .fasep__path { stroke-dashoffset: 0; }
+  .reveal-word__inner { transform: none !important; transition: none !important; }
+  .marquee__track { animation: none !important; }
+  .cursor { display: none !important; }
 }
