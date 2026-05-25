@@ -9,7 +9,36 @@ import content from './content.js';
   'use strict';
 
   /* ──────────────────────────────────────────────
-     0. LANGUAGE / i18n
+     0a. DARK / LIGHT THEME
+     ────────────────────────────────────────────── */
+  const THEME_KEY = 'mc_theme';
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  let currentTheme = savedTheme || (systemDark ? 'dark' : 'light');
+
+  function applyTheme(theme) {
+    currentTheme = theme;
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    if (themeToggle) {
+      themeToggle.textContent = theme === 'dark' ? '☀' : '☽';
+      themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+  }
+
+  applyTheme(currentTheme);
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     0b. LANGUAGE / i18n
      ────────────────────────────────────────────── */
   const STORAGE_KEY = 'mc_lang';
   let currentLang = localStorage.getItem(STORAGE_KEY) || 'en';
@@ -171,7 +200,44 @@ import content from './content.js';
   }
 
   /* ──────────────────────────────────────────────
-     6. SCROLL PROGRESS BAR
+     6. CHAPTER NAV HIGHLIGHTS
+     ────────────────────────────────────────────── */
+  const chapterLinks = document.querySelectorAll('.nav__chapter[data-for]');
+  if (chapterLinks.length) {
+    const chapterSections = document.querySelectorAll(
+      'section[data-section="03"], section[data-section="04"], section[data-section="05"], section[data-section="06"], section[data-section="07"]'
+    );
+
+    const setActive = (sectionNum) => {
+      chapterLinks.forEach(link => {
+        link.classList.toggle('is-active', link.dataset.for === sectionNum);
+      });
+    };
+
+    const chapterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActive(entry.target.dataset.section);
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '-10% 0px -55% 0px' });
+
+    chapterSections.forEach(s => chapterObserver.observe(s));
+
+    // Clear active when scrolled back to top
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          chapterLinks.forEach(l => l.classList.remove('is-active'));
+        }
+      });
+    }, { threshold: 0.1 });
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) heroObserver.observe(heroSection);
+  }
+
+  /* ──────────────────────────────────────────────
+     6b. SCROLL PROGRESS BAR
      ────────────────────────────────────────────── */
   const progressBar = document.querySelector('.progress-bar');
   if (progressBar) {
