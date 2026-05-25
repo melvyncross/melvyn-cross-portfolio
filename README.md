@@ -2,6 +2,8 @@
 
 Editorial portfolio. Built as a long-form scroll story about the Planet Soar build.
 
+**Live:** [melvyn-cross.vercel.app](https://melvyn-cross.vercel.app) · **Repo:** [github.com/melvyncross/melvyn-cross-portfolio](https://github.com/melvyncross/melvyn-cross-portfolio)
+
 ## Stack
 
 - Pure HTML / CSS / vanilla JS — no frameworks, no build step
