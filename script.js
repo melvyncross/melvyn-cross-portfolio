@@ -185,54 +185,83 @@ import content from './content.js';
   }
 
   /* ──────────────────────────────────────────────
-     7. CUSTOM CURSOR (fine pointer / mouse only)
+     7. CUSTOM CURSOR — dot + ring + click ripple
      ────────────────────────────────────────────── */
   const isFinePointer = window.matchMedia('(pointer: fine)').matches;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (isFinePointer && !prefersReducedMotion) {
-    const cursor = document.querySelector('.cursor');
-    if (cursor) {
-      let mouseX = 0, mouseY = 0;
-      let cursorX = 0, cursorY = 0;
-      let isVisible = false;
-      let rafId;
+    const dot  = document.querySelector('.cursor-dot');
+    const ring = document.querySelector('.cursor-ring');
+
+    if (dot && ring) {
+      let mX = 0, mY = 0;
+      let dX = 0, dY = 0;  // dot position
+      let rX = 0, rY = 0;  // ring position
+      let visible = false;
+      const DOT_EASE  = 0.15;
+      const RING_EASE = 0.065;
 
       document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!isVisible) {
-          cursor.classList.remove('cursor--hidden');
-          isVisible = true;
+        mX = e.clientX; mY = e.clientY;
+        if (!visible) {
+          dot.classList.add('cursor-dot--visible');
+          ring.classList.add('cursor-ring--visible');
+          dot.classList.remove('cursor-dot--hidden');
+          ring.classList.remove('cursor-ring--hidden');
+          visible = true;
         }
       });
 
       document.addEventListener('mouseleave', () => {
-        cursor.classList.add('cursor--hidden');
-        isVisible = false;
+        dot.classList.add('cursor-dot--hidden');
+        ring.classList.add('cursor-ring--hidden');
+        dot.classList.remove('cursor-dot--visible');
+        ring.classList.remove('cursor-ring--visible');
+        visible = false;
       });
 
       document.addEventListener('mouseenter', () => {
-        cursor.classList.remove('cursor--hidden');
-        isVisible = true;
+        dot.classList.add('cursor-dot--visible');
+        ring.classList.add('cursor-ring--visible');
+        dot.classList.remove('cursor-dot--hidden');
+        ring.classList.remove('cursor-ring--hidden');
+        visible = true;
       });
 
-      // Enlarge cursor on interactive elements
-      const interactives = 'a, button, [role="button"]';
-      document.querySelectorAll(interactives).forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--large'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--large'));
+      // Click ripple — spawn element, auto-remove on animationend
+      document.addEventListener('mousedown', () => {
+        const ripple = document.createElement('div');
+        ripple.className = 'cursor-ripple';
+        ripple.style.left = mX + 'px';
+        ripple.style.top  = mY + 'px';
+        document.body.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
       });
 
-      // Lerp animation loop
-      const ease = 0.12;
-      const animateCursor = () => {
-        cursorX += (mouseX - cursorX) * ease;
-        cursorY += (mouseY - cursorY) * ease;
-        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
-        rafId = requestAnimationFrame(animateCursor);
+      // Hover states — shrink ring, grow dot slightly
+      document.querySelectorAll('a, button, [role="button"]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          dot.classList.add('cursor-dot--hover');
+          ring.classList.add('cursor-ring--hover');
+        });
+        el.addEventListener('mouseleave', () => {
+          dot.classList.remove('cursor-dot--hover');
+          ring.classList.remove('cursor-ring--hover');
+        });
+      });
+
+      // RAF lerp loop — dot fast, ring lagging
+      const tickCursor = () => {
+        dX += (mX - dX) * DOT_EASE;
+        dY += (mY - dY) * DOT_EASE;
+        rX += (mX - rX) * RING_EASE;
+        rY += (mY - rY) * RING_EASE;
+        dot.style.transform  = `translate(${dX}px, ${dY}px) translate(-50%, -50%)`;
+        ring.style.transform = `translate(${rX}px, ${rY}px) translate(-50%, -50%)`;
+        requestAnimationFrame(tickCursor);
       };
-      animateCursor();
+      tickCursor();
     }
   }
 
@@ -313,6 +342,82 @@ import content from './content.js';
     if (portraitImg.complete && portraitImg.naturalWidth === 0) {
       portraitImg.style.display = 'none';
       portraitPlaceholder.style.display = 'flex';
+    }
+  }
+
+  /* ──────────────────────────────────────────────
+     10. MAGNETIC BUTTON (.contact__cv)
+     ────────────────────────────────────────────── */
+  if (isFinePointer && !prefersReducedMotion) {
+    const magBtn = document.querySelector('.contact__cv');
+    if (magBtn) {
+      const STRENGTH = 0.35;
+      const RADIUS   = 120;
+      let mBtnX = 0, mBtnY = 0, btnActive = false;
+
+      magBtn.addEventListener('mousemove', (e) => {
+        const rect = magBtn.getBoundingClientRect();
+        const cx = rect.left + rect.width  / 2;
+        const cy = rect.top  + rect.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < RADIUS) {
+          mBtnX = dx * STRENGTH;
+          mBtnY = dy * STRENGTH;
+          btnActive = true;
+        }
+      });
+
+      magBtn.addEventListener('mouseleave', () => {
+        mBtnX = 0; mBtnY = 0;
+        btnActive = false;
+        magBtn.style.transform = '';
+      });
+
+      const tickMagnet = () => {
+        if (btnActive) {
+          magBtn.style.transform = `translate(${mBtnX}px, ${mBtnY}px)`;
+        }
+        requestAnimationFrame(tickMagnet);
+      };
+      tickMagnet();
+    }
+  }
+
+  /* ──────────────────────────────────────────────
+     11. HERO MOUSE PARALLAX
+         title/caption layer shifts subtly with mouse
+     ────────────────────────────────────────────── */
+  if (isFinePointer && !prefersReducedMotion) {
+    const heroLeft = document.querySelector('.hero__left');
+    const hero     = document.querySelector('.hero');
+
+    if (heroLeft && hero) {
+      let pX = 0, pY = 0;
+      let tX = 0, tY = 0;
+      const PARA_EASE = 0.055;
+      const DEPTH = 14; // max px shift
+
+      document.addEventListener('mousemove', (e) => {
+        // Only activate while within hero vertical bounds
+        const rect = hero.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        // Normalise -1 → +1 from viewport centre
+        pX = (e.clientX / window.innerWidth  - 0.5) * 2;
+        pY = (e.clientY / window.innerHeight - 0.5) * 2;
+      });
+
+      const tickParallax = () => {
+        const rect = hero.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < window.innerHeight) {
+          tX += (pX * DEPTH - tX) * PARA_EASE;
+          tY += (pY * DEPTH - tY) * PARA_EASE;
+          heroLeft.style.transform = `translate(${tX}px, ${tY}px)`;
+        }
+        requestAnimationFrame(tickParallax);
+      };
+      tickParallax();
     }
   }
 
