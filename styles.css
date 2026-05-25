@@ -46,6 +46,47 @@
   --rule-ink: rgba(205, 204, 202, 0.15);
 }
 
+/* ── Dark mode: fix elements using color:var(--ink) on now-dark surfaces ── */
+/* --ink (#0A1628 navy) is used for both dark BG sections AND as text on    */
+/* cream sections. In dark mode cream→#171614, so ink-on-dark is invisible. */
+[data-theme="dark"] .beginning__title,
+[data-theme="dark"] .beginning__chapter-name,
+[data-theme="dark"] .deals__title,
+[data-theme="dark"] .deal__index,
+[data-theme="dark"] .deal__figure,
+[data-theme="dark"] .deal__story h3,
+[data-theme="dark"] .fasep__title,
+[data-theme="dark"] .fasep__text .lead,
+[data-theme="dark"] .contact__cta,
+[data-theme="dark"] .contact__link,
+[data-theme="dark"] .contact__arrow { color: var(--ink-text); }
+
+/* stat__label uses color:var(--cream) on navy bg — cream is now dark */
+[data-theme="dark"] .stat__label { color: var(--ink-mute); }
+
+/* number section gradient hardcodes amber end — override in dark mode */
+[data-theme="dark"] .number {
+  background: linear-gradient(180deg, #0A1628 0%, #1a2942 50%, #3d7a83 100%);
+}
+
+/* highlight underlines on strong text use hardcoded amber rgba */
+[data-theme="dark"] .beginning__body strong {
+  color: var(--ink-text);
+  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.3) 60%);
+}
+[data-theme="dark"] .fasep__text strong {
+  color: var(--ink-text);
+  background: linear-gradient(180deg, transparent 60%, rgba(79, 152, 163, 0.35) 60%);
+}
+
+/* SVG node labels in FASEP map */
+[data-theme="dark"] .fasep__node text { fill: var(--ink-text); }
+[data-theme="dark"] .fasep__node--origin text { fill: var(--paper-mute); }
+
+/* contact link hover: dark bg fill stays visible */
+[data-theme="dark"] .contact__link::before { background: var(--ink-soft); }
+[data-theme="dark"] .contact__link:hover .contact__value { color: var(--ink-text); }
+
 /* ============== RESET ============== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -1152,6 +1193,8 @@ em { font-style: italic; }
   display: flex;
   width: max-content;
   animation: marquee 24s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .marquee:hover .marquee__track {
   animation-play-state: paused;
@@ -1177,8 +1220,8 @@ em { font-style: italic; }
   flex-shrink: 0;
 }
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
 }
 
 /* ============== TEXT REVEAL (scroll-triggered word mask) ============== */
@@ -1186,9 +1229,11 @@ em { font-style: italic; }
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  /* small breathing room so descenders don't clip */
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
+  /* generous room for Fraunces display ascenders + descenders */
+  padding-top: 0.12em;
+  margin-top: -0.12em;
+  padding-bottom: 0.22em;
+  margin-bottom: -0.22em;
 }
 .reveal-word__inner {
   display: inline-block;
