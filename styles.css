@@ -1361,6 +1361,20 @@ em { font-style: italic; }
 [data-theme="dark"] .bl-eyebrow__text { color: rgba(246,248,251,0.45); }
 .pt-more .bl-eyebrow__text, .latest-posts .bl-eyebrow__text { color: rgba(245,237,224,0.45); }
 
+/* Preview mode badge */
+.bl-demo-badge {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(246,248,251,0.5);
+  border: 1px solid rgba(246,248,251,0.18);
+  padding: 0.2em 0.5em;
+  border-radius: 2px;
+  margin-left: 0.4rem;
+  align-self: center;
+}
+
 /* Category tag */
 .bl-tag {
   display: inline-block;

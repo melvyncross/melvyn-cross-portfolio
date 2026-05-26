@@ -7,6 +7,8 @@
  * JSON-LD, OG meta, Portable Text renderer.
  */
 
+let _rebindCursorHover = null; // set after initCursor(), called after DOM updates
+
 const PROJECT_ID = 'p4gxllem';
 const DATASET    = 'production';
 const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${DATASET}`;
@@ -146,6 +148,36 @@ function miniCard(p) {
       </div>
     </div>
   </a>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOM CURSOR
+// ─────────────────────────────────────────────────────────────────────────────
+function initCursor() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  if (!dot || !ring) return;
+  let mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,visible=false;
+  document.addEventListener('mousemove', e => {
+    mX=e.clientX; mY=e.clientY;
+    if (!visible) { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); visible=true; }
+  });
+  document.addEventListener('mouseleave', () => { dot.classList.add('cursor-dot--hidden'); ring.classList.add('cursor-ring--hidden'); dot.classList.remove('cursor-dot--visible'); ring.classList.remove('cursor-ring--visible'); visible=false; });
+  document.addEventListener('mouseenter', () => { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); dot.classList.remove('cursor-dot--hidden'); ring.classList.remove('cursor-ring--hidden'); visible=true; });
+  document.addEventListener('mousedown', () => {
+    const r=document.createElement('div'); r.className='cursor-ripple'; r.style.left=mX+'px'; r.style.top=mY+'px';
+    document.body.appendChild(r); r.addEventListener('animationend',()=>r.remove(),{once:true});
+  });
+  const bindHover = () => document.querySelectorAll('a,button,[role="button"]').forEach(el => {
+    el.addEventListener('mouseenter',()=>{ dot.classList.add('cursor-dot--hover'); ring.classList.add('cursor-ring--hover'); });
+    el.addEventListener('mouseleave',()=>{ dot.classList.remove('cursor-dot--hover'); ring.classList.remove('cursor-ring--hover'); });
+  });
+  bindHover();
+  const tick=()=>{ dX+=(mX-dX)*0.15; dY+=(mY-dY)*0.15; rX+=(mX-rX)*0.065; rY+=(mY-rY)*0.065; dot.style.transform=`translate(${dX}px,${dY}px) translate(-50%,-50%)`; ring.style.transform=`translate(${rX}px,${rY}px) translate(-50%,-50%)`; requestAnimationFrame(tick); };
+  tick();
+  return bindHover;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -351,6 +383,7 @@ function renderPost(post, adjacent, more) {
   document.getElementById('pt-article').hidden=false;
   initProgress();
   initCoverParallax();
+  if(_rebindCursorHover) _rebindCursorHover();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -358,37 +391,39 @@ function renderPost(post, adjacent, more) {
 // ─────────────────────────────────────────────────────────────────────────────
 const DEMO_POST = {
   _id:'demo',
-  title:'Why AI Won\'t Kill E-Commerce — It Will Reinvent It',
+  title:'Lorem Ipsum: E-Commerce & the Future of Digital Retail',
   slug:{current:'__demo__'},
   publishedAt:'2026-05-26T09:00:00Z',
   category:'ecommerce',
-  tags:['AI','E-Commerce','Strategy','Retail'],
-  excerpt:'The hype cycle is in full swing. Here\'s what\'s actually happening beneath the surface of AI-powered shopping — and why the best operators are already three steps ahead.',
-  coverImage:{
-    asset:{_ref:'image-demo'},
-    alt:'Digital storefront with AI interface overlay'
-  },
+  tags:['Lorem Ipsum','E-Commerce','Strategy','Demo'],
+  excerpt:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua — a preview of what your posts will look like.',
+  coverImage:{asset:{_ref:'image-demo'},alt:'E-Commerce editorial cover'},
   featured:true,
   body:[
-    {_type:'block',style:'normal',_key:'a1',children:[{_type:'span',text:'The hype cycle is at full throttle. Every week brings another headline about AI replacing search, AI replacing checkout, AI replacing the customer service team entirely. Most of it is noise. But underneath the noise, something real is shifting — and the operators who understand it are quietly building an enormous lead.'}]},
-    {_type:'block',style:'h2',_key:'a2',children:[{_type:'span',text:'The Three Waves of AI in Retail'}]},
-    {_type:'block',style:'normal',_key:'a3',children:[{_type:'span',text:'The first wave was recommendation engines. Netflix, Spotify, Amazon — all built on the insight that predicting what someone wants next is worth more than any single transaction. The second wave was demand forecasting and logistics optimisation: the invisible machinery that means your order arrives tomorrow instead of next week.'}]},
-    {_type:'block',style:'normal',_key:'a4',children:[{_type:'span',text:'We\'re entering the third wave, and it\'s qualitatively different from the first two. The first two waves made existing processes faster. This wave is changing what processes exist at all.'}]},
-    {_type:'block',style:'blockquote',_key:'a5',children:[{_type:'span',text:'The brands winning in five years won\'t be the ones who adopted AI earliest. They\'ll be the ones who reimagined their customer relationships around what AI makes newly possible.'}]},
-    {_type:'block',style:'h2',_key:'a6',children:[{_type:'span',text:'What Actually Changes at the Checkout'}]},
-    {_type:'block',style:'normal',_key:'a7',children:[{_type:'span',text:'The most interesting territory right now isn\'t the front-end chatbot. Everyone has a chatbot. The interesting territory is in how AI changes the economics of personalisation at scale.'}]},
-    {_type:'block',style:'normal',_key:'a8',children:[{_type:'span',text:'Consider dynamic bundling. For years, bundles were a blunt instrument — merchandisers would build a handful of curated sets, run them for a season, measure attachment rates, iterate slowly. With AI, every customer session can generate a bundle tailored to that specific basket in real time, priced to the margin target, offered at exactly the right moment in the journey.'}]},
-    {_type:'block',style:'h3',_key:'a9',children:[{_type:'span',text:'The Margin Arithmetic'}]},
-    {_type:'block',style:'normal',_key:'a10',children:[{_type:'span',text:'This matters because e-commerce margins are structurally thin. The average Shopify store runs at 10–20% gross margin after COGS. Take out fulfilment, returns, and paid acquisition and most direct-to-consumer brands are fighting over single-digit net margins.'}]},
-    {_type:'block',style:'normal',_key:'a11',children:[{_type:'span',text:'AI-driven personalisation doesn\'t just increase AOV — it reduces the acquisition cost per profitable order. Those are two very different levers, and they compound.'}]},
-    {_type:'block',style:'h2',_key:'a12',children:[{_type:'span',text:'Three Things You Should Be Doing Right Now'}]},
-    {_type:'block',style:'normal',_key:'b1',children:[{_type:'span',text:'Rather than a sweeping roadmap, here are the three highest-leverage moves for any mid-market operator:'}]},
-    {_type:'block',_key:'b2',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Audit your zero-party data strategy. The AI models that will win at personalisation need signal. Email open rates are not signal. Purchase history, explicit preference capture, and post-purchase surveys are signal. Start collecting it deliberately.'}]},
-    {_type:'block',_key:'b3',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Run a held-out test on your email and SMS cadences using an AI copy tool. Don\'t replace your copywriter — give them a co-pilot. Measure lift in click-to-purchase rate, not vanity open rates.'}]},
-    {_type:'block',_key:'b4',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Map your customer service ticket categories and identify the top three by volume that could be resolved in a single AI-assisted interaction. Route those to a well-prompted LLM. Measure CSAT before and after.'}]},
-    {_type:'block',style:'h3',_key:'b5',children:[{_type:'span',text:'The Honest Caveat'}]},
-    {_type:'block',style:'normal',_key:'b6',children:[{_type:'span',text:'None of this is magic. AI amplifies what\'s already there. If your product is mediocre, AI will help you sell mediocre product to more people more efficiently — until retention craters and your LTV model falls apart. The fundamentals still matter. Product, price, and trust are not features AI can generate for you.'}]},
-    {_type:'block',style:'normal',_key:'b7',children:[{_type:'span',text:'But if you\'re already doing the fundamentals right, AI is the best margin-expansion opportunity this industry has seen since mobile. The operators who treat it as a tool rather than a strategy will extract meaningful value. The ones waiting for a turnkey solution will still be waiting when the window closes.'}]},
+    {_type:'block',style:'normal',_key:'p0',children:[{_type:'span',text:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'}]},
+    {_type:'block',style:'normal',_key:'p0b',children:[{_type:'span',text:'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.'}]},
+
+    {_type:'block',style:'h2',_key:'h1',children:[{_type:'span',text:'Section One: Dolor Sit Amet'}]},
+    {_type:'block',style:'normal',_key:'p1',children:[{_type:'span',text:'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.'}]},
+    {_type:'block',style:'normal',_key:'p1b',children:[{_type:'span',text:'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum.'}]},
+
+    {_type:'block',style:'blockquote',_key:'q1',children:[{_type:'span',text:'"At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi."'}]},
+
+    {_type:'block',style:'h2',_key:'h2',children:[{_type:'span',text:'Section Two: Consectetur Adipiscing'}]},
+    {_type:'block',style:'normal',_key:'p2',children:[{_type:'span',text:'Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet.'}]},
+    {_type:'block',style:'h3',_key:'h2a',children:[{_type:'span',text:'Sub-section: Ut Labore'}]},
+    {_type:'block',style:'normal',_key:'p2a',children:[{_type:'span',text:'Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.'}]},
+    {_type:'block',style:'normal',_key:'p2b',children:[{_type:'span',marks:['strong'],text:'Key insight:'},{_type:'span',text:' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sagittis ipsum at felis dignissim, vitae molestie arcu varius. Mauris euismod ipsum nec enim tincidunt, eu accumsan nisi faucibus.'}]},
+
+    {_type:'block',style:'h2',_key:'h3',children:[{_type:'span',text:'Section Three: Three Key Takeaways'}]},
+    {_type:'block',style:'normal',_key:'p3',children:[{_type:'span',text:'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Here is what the bullet list style looks like in this editorial design:'}]},
+    {_type:'block',_key:'li1',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'}]},
+    {_type:'block',_key:'li2',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur consequat.'}]},
+    {_type:'block',_key:'li3',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'}]},
+
+    {_type:'block',style:'h3',_key:'h3b',children:[{_type:'span',text:'Closing Thoughts'}]},
+    {_type:'block',style:'normal',_key:'p4',children:[{_type:'span',text:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sagittis ipsum at felis dignissim, vitae molestie arcu varius. Mauris euismod ipsum nec enim tincidunt, eu accumsan nisi faucibus. Integer vulputate lectus feugiat felis condimentum, a sodales tortor dapibus.'}]},
+    {_type:'block',style:'normal',_key:'p5',children:[{_type:'span',text:'Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla quis lorem ut libero malesuada feugiat. Pellentesque in ipsum id orci porta dapibus. Mauris blandit aliquet elit, eget tincidunt nibh pulvinar a. Sed porttitor lectus nibh, donec sollicitudin molestie malesuada.'}]},
   ]
 };
 
@@ -400,6 +435,7 @@ const DEMO_COVER_URL = 'https://images.unsplash.com/photo-1557821552-17105176677
 // ─────────────────────────────────────────────────────────────────────────────
 async function main() {
   initTheme();
+  _rebindCursorHover = initCursor();
   const slugVal=new URLSearchParams(window.location.search).get('slug');
 
   if(!slugVal){
