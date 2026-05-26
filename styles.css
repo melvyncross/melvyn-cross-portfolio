@@ -89,6 +89,12 @@
 [data-theme="dark"] .fasep__node--origin text { fill: #7a7876; }
 [data-theme="dark"] .fasep__arc { stroke: var(--amber-deep); }
 
+/* ── Smooth theme toggle — section backgrounds transition in sync with body ── */
+.hero, .built, .stat, .bring, .foot, .number,
+.beginning, .deals, .fasep, .contact {
+  transition: background-color 0.3s ease, background 0.3s ease;
+}
+
 /* ============== RESET ============== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
@@ -1244,7 +1250,7 @@ em { font-style: italic; }
 }
 .reveal-word__inner {
   display: inline-block;
-  transform: translateY(110%);
+  transform: translateY(160%);
   transition: transform 0.85s var(--ease-out);
 }
 /* Stagger via CSS custom property set by JS */
