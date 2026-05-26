@@ -488,3 +488,84 @@ import content from './content.js';
   }
 
 })();
+
+/* ──────────────────────────────────────────────────────────────────
+   LATEST BLOG POSTS — homepage carousel
+   Fetches the 3 most recent posts from Sanity CDN at runtime.
+   Hides the section entirely if there are no posts yet.
+   ────────────────────────────────────────────────────────────────── */
+(async () => {
+  const PROJECT_ID = 'p4gxllem';
+  const DATASET    = 'production';
+  const API_VER    = '2024-01-01';
+  const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v${API_VER}/data/query/${DATASET}`;
+
+  const section = document.getElementById('latest-posts');
+  const grid    = document.getElementById('latest-posts-grid');
+  if (!section || !grid) return;
+
+  function sanityImageUrl(ref, width = 600) {
+    if (!ref) return null;
+    const parts = ref.replace('image-', '').split('-');
+    const ext = parts.pop();
+    const id  = parts.join('-');
+    return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${width}&auto=format`;
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function countWords(body = []) {
+    let w = 0;
+    body.forEach(b => b._type === 'block' && b.children?.forEach(s => { if (s.text) w += s.text.split(/\s+/).filter(Boolean).length; }));
+    return w;
+  }
+
+  function escHtml(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  try {
+    const query = encodeURIComponent(
+      `*[_type == "post"] | order(publishedAt desc)[0..2]{
+        _id, title, slug, publishedAt, excerpt, category,
+        coverImage { asset, alt }, body
+      }`
+    );
+    const res  = await fetch(`${CDN}?query=${query}`);
+    const data = await res.json();
+    const posts = data.result || [];
+
+    if (!posts.length) return; // stay hidden
+
+    const CATEGORY_LABELS = { ecommerce: 'E-Commerce', ai: 'AI', market: 'Market', opinion: 'Opinion', strategy: 'Strategy' };
+
+    grid.innerHTML = posts.map(p => {
+      const imgUrl = sanityImageUrl(p.coverImage?.asset?._ref, 600);
+      const mins   = Math.max(1, Math.ceil(countWords(p.body) / 238));
+      const cat    = CATEGORY_LABELS[p.category] || p.category || '';
+      return `
+        <a href="/post?slug=${encodeURIComponent(p.slug?.current || '')}" class="lp-card">
+          <div class="lp-card__img-wrap">
+            ${imgUrl
+              ? `<img class="lp-card__img" src="${imgUrl}" alt="${escHtml(p.coverImage?.alt || p.title)}" loading="lazy" />`
+              : `<div class="lp-card__img-placeholder"></div>`}
+          </div>
+          <div class="lp-card__body">
+            ${cat ? `<span class="lp-card__cat">${escHtml(cat)}</span>` : ''}
+            <h3 class="lp-card__title">${escHtml(p.title)}</h3>
+            <p class="lp-card__excerpt">${escHtml(p.excerpt || '')}</p>
+            <span class="lp-card__meta">${fmtDate(p.publishedAt)} · ${mins} min read</span>
+          </div>
+        </a>`;
+    }).join('');
+
+    section.hidden = false;
+
+  } catch (e) {
+    // Fail silently — blog section simply stays hidden
+    console.warn('[latest-posts]', e.message);
+  }
+})();

@@ -25,6 +25,17 @@ export default defineConfig({
                   .documentId('siteContent')
                   .title('Portfolio Content')
               ),
+            S.divider(),
+            // Blog posts — list with newest first
+            S.listItem()
+              .title('Blog Posts')
+              .schemaType('post')
+              .child(
+                S.documentList()
+                  .title('Blog Posts')
+                  .schemaType('post')
+                  .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+              ),
           ]),
     }),
   ],

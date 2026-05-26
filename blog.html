@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog — Melvyn Cross</title>
+  <meta name="description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross — an e-commerce builder who spent six years scaling a €1.6M/year European business." />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://melvyncross.com/blog" />
+  <meta property="og:title"       content="Blog — Melvyn Cross" />
+  <meta property="og:description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross." />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Blog — Melvyn Cross" />
+  <meta name="twitter:description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross." />
+
+  <!-- Flash-prevention: apply saved theme before CSS loads -->
+  <script>(function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="nav">
+    <a href="/" class="nav__mark">MC</a>
+    <div class="nav__meta">
+      <a href="/blog" class="nav__blog-link nav__blog-link--active">Blog</a>
+      <button class="nav__theme" id="theme-toggle" aria-label="Toggle dark mode">☽</button>
+    </div>
+  </nav>
+
+  <!-- ── BLOG HERO ── -->
+  <header class="blog-header">
+    <div class="blog-header__inner">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/" class="breadcrumb__link">Home</a>
+        <span class="breadcrumb__sep" aria-hidden="true">→</span>
+        <span class="breadcrumb__current" aria-current="page">Blog</span>
+      </nav>
+      <h1 class="blog-header__title">The <em>Dispatch</em>.</h1>
+      <p class="blog-header__sub">E-commerce, AI, and what's actually happening in the market.</p>
+    </div>
+  </header>
+
+  <!-- ── POST GRID ── -->
+  <main class="blog-main" id="blog-grid">
+    <!-- Loading skeleton -->
+    <div class="blog-skeleton" id="blog-skeleton" aria-hidden="true">
+      <div class="blog-skeleton__card"></div>
+      <div class="blog-skeleton__card"></div>
+      <div class="blog-skeleton__card"></div>
+    </div>
+
+    <!-- Post grid rendered by blog.js -->
+    <div class="blog-grid" id="blog-posts" hidden></div>
+
+    <!-- Empty state -->
+    <div class="blog-empty" id="blog-empty" hidden>
+      <p class="blog-empty__text">Nothing published yet — check back soon.</p>
+    </div>
+
+    <!-- Error state -->
+    <div class="blog-error" id="blog-error" hidden>
+      <p class="blog-error__text">Could not load posts right now. Try refreshing.</p>
+    </div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="foot">
+    <div class="foot__row">
+      <span class="foot__col">© 2026 Melvyn Cross</span>
+      <span class="foot__col foot__col--center">Built in Lille. Hosted on Vercel.</span>
+      <span class="foot__col foot__col--right">
+        <a href="/blog" class="foot__blog-link">Blog</a>
+      </span>
+    </div>
+  </footer>
+
+  <script type="module" src="blog.js"></script>
+</body>
+</html>
