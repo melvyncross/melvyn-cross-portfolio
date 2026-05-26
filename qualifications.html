@@ -16,6 +16,12 @@
 </head>
 <body class="qua-page">
 
+  <!-- ── PAGE TRANSITION CURTAIN — first child so it paints before any content ── -->
+  <div id="pt-curtain" style="position:fixed;inset:0;background:#0A1628;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;pointer-events:none;">
+    <span style="font-family:'Fraunces','Times New Roman',serif;font-size:clamp(3.5rem,10vw,6rem);font-style:italic;font-weight:400;letter-spacing:-0.03em;color:#F5EDE0;line-height:1;user-select:none;">MC</span>
+    <span class="pt-dot" style="width:5px;height:5px;border-radius:50%;background:#F4A547;"></span>
+  </div>
+
   <!-- ── CUSTOM CURSOR ── -->
   <div class="cursor-dot"  aria-hidden="true"></div>
   <div class="cursor-ring" aria-hidden="true"></div>
