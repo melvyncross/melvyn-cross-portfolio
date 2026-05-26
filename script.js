@@ -490,26 +490,25 @@ import content from './content.js';
 })();
 
 /* ──────────────────────────────────────────────────────────────────
-   LATEST BLOG POSTS — homepage carousel
+   LATEST BLOG POSTS — homepage section
    Fetches the 3 most recent posts from Sanity CDN at runtime.
+   Uses the same bl-card system as the blog listing page.
    Hides the section entirely if there are no posts yet.
    ────────────────────────────────────────────────────────────────── */
 (async () => {
   const PROJECT_ID = 'p4gxllem';
   const DATASET    = 'production';
-  const API_VER    = '2024-01-01';
-  const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v${API_VER}/data/query/${DATASET}`;
+  const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${DATASET}`;
 
   const section = document.getElementById('latest-posts');
   const grid    = document.getElementById('latest-posts-grid');
   if (!section || !grid) return;
 
-  function sanityImageUrl(ref, width = 600) {
+  function imgUrl(ref, w = 800) {
     if (!ref) return null;
     const parts = ref.replace('image-', '').split('-');
-    const ext = parts.pop();
-    const id  = parts.join('-');
-    return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${width}&auto=format`;
+    const ext = parts.pop(); const id = parts.join('-');
+    return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${w}&auto=format&fit=crop&sat=-5`;
   }
 
   function fmtDate(iso) {
@@ -517,47 +516,49 @@ import content from './content.js';
     return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  function countWords(body = []) {
+  function readTime(body = []) {
     let w = 0;
     body.forEach(b => b._type === 'block' && b.children?.forEach(s => { if (s.text) w += s.text.split(/\s+/).filter(Boolean).length; }));
-    return w;
+    return Math.max(1, Math.ceil(w / 238));
   }
 
-  function escHtml(s) {
+  function esc(s) {
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  const CAT = { ecommerce: 'E-Commerce', ai: 'AI', market: 'Market', opinion: 'Opinion', strategy: 'Strategy' };
+
   try {
-    const query = encodeURIComponent(
-      `*[_type == "post"] | order(publishedAt desc)[0..2]{
-        _id, title, slug, publishedAt, excerpt, category,
-        coverImage { asset, alt }, body
-      }`
+    const q = encodeURIComponent(
+      `*[_type=="post"]|order(publishedAt desc)[0..2]{_id,title,slug,publishedAt,category,coverImage{asset,alt},body}`
     );
-    const res  = await fetch(`${CDN}?query=${query}`);
-    const data = await res.json();
-    const posts = data.result || [];
+    const res   = await fetch(`${CDN}?query=${q}`);
+    const posts = (await res.json()).result || [];
 
     if (!posts.length) return; // stay hidden
 
-    const CATEGORY_LABELS = { ecommerce: 'E-Commerce', ai: 'AI', market: 'Market', opinion: 'Opinion', strategy: 'Strategy' };
-
     grid.innerHTML = posts.map(p => {
-      const imgUrl = sanityImageUrl(p.coverImage?.asset?._ref, 600);
-      const mins   = Math.max(1, Math.ceil(countWords(p.body) / 238));
-      const cat    = CATEGORY_LABELS[p.category] || p.category || '';
+      const url  = imgUrl(p.coverImage?.asset?._ref, 800);
+      const slug = p.slug?.current || '';
+      const cat  = CAT[p.category] || p.category || '';
+      const mins = readTime(p.body);
       return `
-        <a href="/post?slug=${encodeURIComponent(p.slug?.current || '')}" class="lp-card">
-          <div class="lp-card__img-wrap">
-            ${imgUrl
-              ? `<img class="lp-card__img" src="${imgUrl}" alt="${escHtml(p.coverImage?.alt || p.title)}" loading="lazy" />`
-              : `<div class="lp-card__img-placeholder"></div>`}
-          </div>
-          <div class="lp-card__body">
-            ${cat ? `<span class="lp-card__cat">${escHtml(cat)}</span>` : ''}
-            <h3 class="lp-card__title">${escHtml(p.title)}</h3>
-            <p class="lp-card__excerpt">${escHtml(p.excerpt || '')}</p>
-            <span class="lp-card__meta">${fmtDate(p.publishedAt)} · ${mins} min read</span>
+        <a href="/post?slug=${encodeURIComponent(slug)}" class="bl-card bl-card--small">
+          <div class="bl-card__bg" ${url ? `style="background-image:url('${url}')"` : ''}></div>
+          <div class="bl-card__overlay"></div>
+          <div class="bl-card__content">
+            <div class="bl-card__top">
+              ${cat ? `<span class="bl-tag">${esc(cat)}</span>` : ''}
+            </div>
+            <div class="bl-card__bottom">
+              <h3 class="bl-card__title">${esc(p.title || '')}</h3>
+              <div class="bl-card__meta">
+                <span>${fmtDate(p.publishedAt)}</span>
+                <span class="bl-card__dot">·</span>
+                <span>${mins} min read</span>
+              </div>
+              <div class="bl-card__arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M14.086 7.5L11.404 4.818 12.11 4.11 16 8l-3.89 3.89-.707-.707L14.086 8.5H0v-1h14.086z"/></svg></div>
+            </div>
           </div>
         </a>`;
     }).join('');
@@ -565,7 +566,7 @@ import content from './content.js';
     section.hidden = false;
 
   } catch (e) {
-    // Fail silently — blog section simply stays hidden
+    // Fail silently — section stays hidden
     console.warn('[latest-posts]', e.message);
   }
 })();

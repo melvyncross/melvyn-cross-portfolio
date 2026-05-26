@@ -3,21 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog — Melvyn Cross</title>
-  <meta name="description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross — an e-commerce builder who spent six years scaling a €1.6M/year European business." />
-
-  <!-- Open Graph -->
+  <title>The Dispatch — Melvyn Cross</title>
+  <meta name="description" content="Thoughts on e-commerce strategy, AI in retail, and what's actually happening in the market. Written by Melvyn Cross." />
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://melvyncross.com/blog" />
-  <meta property="og:title"       content="Blog — Melvyn Cross" />
-  <meta property="og:description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross." />
+  <meta property="og:title"       content="The Dispatch — Melvyn Cross" />
+  <meta property="og:description" content="Thoughts on e-commerce strategy, AI in retail, and what's actually happening in the market." />
+  <meta name="twitter:card"       content="summary_large_image" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="Blog — Melvyn Cross" />
-  <meta name="twitter:description" content="Thoughts on e-commerce, AI, and market strategy from Melvyn Cross." />
-
-  <!-- Flash-prevention: apply saved theme before CSS loads -->
   <script>(function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,61 +17,76 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="blog-page">
 
   <!-- ── NAV ── -->
-  <nav class="nav">
+  <nav class="nav blog-nav">
     <a href="/" class="nav__mark">MC</a>
     <div class="nav__meta">
-      <a href="/blog" class="nav__blog-link nav__blog-link--active">Blog</a>
+      <a href="/blog" class="nav__blog-link nav__blog-link--active">The Dispatch</a>
       <button class="nav__theme" id="theme-toggle" aria-label="Toggle dark mode">☽</button>
     </div>
   </nav>
 
-  <!-- ── BLOG HERO ── -->
-  <header class="blog-header">
-    <div class="blog-header__inner">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/" class="breadcrumb__link">Home</a>
-        <span class="breadcrumb__sep" aria-hidden="true">→</span>
-        <span class="breadcrumb__current" aria-current="page">Blog</span>
-      </nav>
-      <h1 class="blog-header__title">The <em>Dispatch</em>.</h1>
-      <p class="blog-header__sub">E-commerce, AI, and what's actually happening in the market.</p>
-    </div>
-  </header>
+  <!-- ── HERO ── -->
+  <section class="bl-hero">
+    <div class="bl-hero__inner">
 
-  <!-- ── POST GRID ── -->
-  <main class="blog-main" id="blog-grid">
-    <!-- Loading skeleton -->
-    <div class="blog-skeleton" id="blog-skeleton" aria-hidden="true">
-      <div class="blog-skeleton__card"></div>
-      <div class="blog-skeleton__card"></div>
-      <div class="blog-skeleton__card"></div>
-    </div>
+      <!-- Left: header text -->
+      <div class="bl-hero__header">
+        <div class="bl-eyebrow">
+          <div class="bl-eyebrow__line"></div>
+          <span class="bl-eyebrow__text">The Dispatch</span>
+          <div class="bl-eyebrow__line"></div>
+        </div>
+        <h1 class="bl-hero__title">Stories &amp; <em>Ideas</em>.</h1>
+        <p class="bl-hero__desc">Where I write about e-commerce strategy, what AI is actually changing, and what the market is doing when no one's looking.</p>
+        <a href="#bl-posts" class="bl-hero__scroll">↓ All posts</a>
+      </div>
 
-    <!-- Post grid rendered by blog.js -->
-    <div class="blog-grid" id="blog-posts" hidden></div>
+      <!-- Right: featured post card -->
+      <div class="bl-hero__featured" id="bl-featured">
+        <div class="bl-card bl-card--featured bl-skeleton" id="bl-featured-card">
+          <div class="bl-skeleton__shine"></div>
+        </div>
+      </div>
 
-    <!-- Empty state -->
-    <div class="blog-empty" id="blog-empty" hidden>
-      <p class="blog-empty__text">Nothing published yet — check back soon.</p>
     </div>
+  </section>
 
-    <!-- Error state -->
-    <div class="blog-error" id="blog-error" hidden>
-      <p class="blog-error__text">Could not load posts right now. Try refreshing.</p>
+  <!-- ── ALL POSTS ── -->
+  <section class="bl-posts" id="bl-posts">
+    <div class="bl-posts__inner">
+
+      <!-- Loading state -->
+      <div class="bl-grid bl-grid--skeleton" id="bl-skeleton">
+        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
+        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
+        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
+      </div>
+
+      <!-- Post grid -->
+      <div class="bl-grid" id="bl-grid" hidden></div>
+
+      <!-- Empty -->
+      <div class="bl-empty" id="bl-empty" hidden>
+        <p class="bl-empty__text">Nothing published yet — check back soon.</p>
+      </div>
+
+      <!-- Error -->
+      <div class="bl-empty" id="bl-error" hidden>
+        <p class="bl-empty__text">Could not load posts. Try refreshing.</p>
+      </div>
+
     </div>
-  </main>
+  </section>
 
   <!-- ── FOOTER ── -->
-  <footer class="foot">
+  <footer class="foot blog-foot">
     <div class="foot__row">
-      <span class="foot__col">© 2026 Melvyn Cross</span>
-      <span class="foot__col foot__col--center">Built in Lille. Hosted on Vercel.</span>
-      <span class="foot__col foot__col--right">
-        <a href="/blog" class="foot__blog-link">Blog</a>
-      </span>
+      <span class="foot__col"><a href="/" class="foot__blog-link">← Portfolio</a></span>
+      <span class="foot__col foot__col--center">© 2026 Melvyn Cross</span>
+      <span class="foot__col foot__col--right">The Dispatch</span>
     </div>
   </footer>
 

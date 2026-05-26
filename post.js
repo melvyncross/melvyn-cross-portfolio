@@ -1,497 +1,353 @@
 /**
- * post.js — Single blog post page
+ * post.js — The Dispatch: single post page
+ * Alec-template-inspired split hero + centred body.
  *
- * Features:
- *  - Reads ?slug= URL param, fetches post from Sanity CDN
- *  - Portable Text → HTML renderer (vanilla JS, no deps)
- *  - Scroll progress bar
- *  - Auto-generated Table of Contents with active-section tracking
- *  - Social sharing: Twitter/X, LinkedIn, copy-link
- *  - Prev / Next post navigation
- *  - Author, breadcrumb, read time, date, tags, category
- *  - Dark mode support
- *  - SEO: <title>, OG tags, JSON-LD Article
+ * Features: scroll progress, breadcrumb, TOC + active section,
+ * social sharing (X, LinkedIn, copy-link), prev/next, more-posts,
+ * JSON-LD, OG meta, Portable Text renderer.
  */
 
 const PROJECT_ID = 'p4gxllem';
 const DATASET    = 'production';
-const API_VER    = '2024-01-01';
-const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v${API_VER}/data/query/${DATASET}`;
+const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${DATASET}`;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// UTILITIES
+// UTILS
 // ─────────────────────────────────────────────────────────────────────────────
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const slug = t => t.toLowerCase().replace(/[^\w\s-]/g,'').replace(/\s+/g,'-');
+const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : '';
+const CAT = {ecommerce:'E-Commerce',ai:'Artificial Intelligence',market:'Market Insights',opinion:'Opinion',strategy:'Strategy'};
 
-function esc(str) {
-  return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function slug(text) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-}
-
-function formatDate(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  });
-}
-
-function estimateReadTime(body = []) {
-  let words = 0;
-  body.forEach(block => {
-    if (block._type === 'block' && Array.isArray(block.children)) {
-      block.children.forEach(span => {
-        if (span.text) words += span.text.split(/\s+/).filter(Boolean).length;
-      });
-    }
-  });
-  return Math.max(1, Math.ceil(words / 238));
-}
-
-function sanityImageUrl(ref, width = 1200) {
+function imgUrl(ref, w=1400) {
   if (!ref) return null;
-  const parts = ref.replace('image-', '').split('-');
-  const ext = parts.pop();
-  const id  = parts.join('-');
-  return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${width}&auto=format`;
+  const parts = ref.replace('image-','').split('-');
+  const ext = parts.pop(); const id = parts.join('-');
+  return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${w}&auto=format&fit=crop&sat=-5`;
 }
 
-const CATEGORY_LABELS = {
-  ecommerce: 'E-Commerce',
-  ai: 'Artificial Intelligence',
-  market: 'Market Insights',
-  opinion: 'Opinion',
-  strategy: 'Strategy',
-};
+function readTime(body=[]) {
+  let w=0;
+  body.forEach(b=>b._type==='block'&&b.children?.forEach(s=>{if(s.text)w+=s.text.split(/\s+/).filter(Boolean).length;}));
+  return Math.max(1,Math.ceil(w/238));
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PORTABLE TEXT → HTML RENDERER
+// PORTABLE TEXT → HTML
 // ─────────────────────────────────────────────────────────────────────────────
+let _tocEntries = [];
 
-let tocEntries = []; // collected while rendering, used for TOC
-
-function renderMark(mark, text, annotations) {
-  if (mark === 'strong') return `<strong>${text}</strong>`;
-  if (mark === 'em')     return `<em>${text}</em>`;
-  if (mark === 'code')   return `<code>${text}</code>`;
-  // Link annotation
-  const ann = annotations?.find(a => a._key === mark);
-  if (ann?._type === 'link' || ann?.href) {
-    const href  = ann.href || '#';
-    const blank = ann.blank !== false;
-    return `<a href="${esc(href)}"${blank ? ' target="_blank" rel="noopener noreferrer"' : ''}>${text}</a>`;
+function renderMark(mark, text, defs) {
+  if (mark==='strong') return `<strong>${text}</strong>`;
+  if (mark==='em')     return `<em>${text}</em>`;
+  if (mark==='code')   return `<code>${text}</code>`;
+  const ann = defs?.find(a=>a._key===mark);
+  if (ann?.href||ann?._type==='link') {
+    const href=ann.href||'#', blank=ann.blank!==false;
+    return `<a href="${esc(href)}"${blank?' target="_blank" rel="noopener noreferrer"':''}>${text}</a>`;
   }
   return text;
 }
 
-function renderSpans(children = [], markDefs = []) {
-  return children.map(span => {
-    if (span._type !== 'span') return '';
-    let text = esc(span.text || '');
-    // Apply marks innermost-first (reversed)
-    const marks = [...(span.marks || [])].reverse();
-    marks.forEach(mark => {
-      text = renderMark(mark, text, markDefs);
-    });
-    return text;
+function renderSpans(children=[], markDefs=[]) {
+  return children.map(span=>{
+    if (span._type!=='span') return '';
+    let t=esc(span.text||'');
+    [...(span.marks||[])].reverse().forEach(m=>{ t=renderMark(m,t,markDefs); });
+    return t;
   }).join('');
 }
 
 function renderBlock(block) {
-  if (block._type === 'image') {
-    const url = sanityImageUrl(block.asset?._ref, 1200);
+  if (block._type==='image') {
+    const url=imgUrl(block.asset?._ref,1200);
     if (!url) return '';
-    const alt     = esc(block.alt || '');
-    const caption = block.caption ? `<figcaption class="post-img__caption">${esc(block.caption)}</figcaption>` : '';
-    return `<figure class="post-img">\n  <img src="${url}" alt="${alt}" loading="lazy" />\n  ${caption}\n</figure>`;
+    const cap=block.caption?`<figcaption class="pt-img__cap">${esc(block.caption)}</figcaption>`:'';
+    return `<figure class="pt-img"><img src="${url}" alt="${esc(block.alt||'')}" loading="lazy">${cap}</figure>`;
   }
+  if (block._type!=='block') return '';
+  const inner=renderSpans(block.children,block.markDefs);
+  const st=block.style||'normal';
 
-  if (block._type !== 'block') return '';
+  if (block.listItem) return {_li:block.listItem,html:`<li>${inner}</li>`};
 
-  const inner = renderSpans(block.children, block.markDefs);
-  const style = block.style || 'normal';
-  const listItem = block.listItem;
-
-  // List items are collected into lists by wrapBlocks
-  if (listItem) {
-    return { _listItem: listItem, _level: block.level || 1, html: `<li>${inner}</li>` };
-  }
-
-  if (style === 'h2') {
-    const id = slug(block.children?.map(s => s.text).join('') || '');
-    const text = block.children?.map(s => s.text).join('') || '';
-    tocEntries.push({ level: 2, id, text });
+  if (st==='h2') {
+    const id=slug(block.children?.map(s=>s.text).join('')||'');
+    _tocEntries.push({level:2,id,text:block.children?.map(s=>s.text).join('')||''});
     return `<h2 id="${id}">${inner}</h2>`;
   }
-  if (style === 'h3') {
-    const id = slug(block.children?.map(s => s.text).join('') || '');
-    const text = block.children?.map(s => s.text).join('') || '';
-    tocEntries.push({ level: 3, id, text });
+  if (st==='h3') {
+    const id=slug(block.children?.map(s=>s.text).join('')||'');
+    _tocEntries.push({level:3,id,text:block.children?.map(s=>s.text).join('')||''});
     return `<h3 id="${id}">${inner}</h3>`;
   }
-  if (style === 'h4') return `<h4>${inner}</h4>`;
-  if (style === 'blockquote') return `<blockquote><p>${inner}</p></blockquote>`;
-  if (style === 'normal') return `<p>${inner}</p>`;
+  if (st==='h4') return `<h4>${inner}</h4>`;
+  if (st==='blockquote') return `<blockquote><p>${inner}</p></blockquote>`;
   return `<p>${inner}</p>`;
 }
 
-function wrapBlocks(blocks = []) {
-  tocEntries = [];
-  const htmlParts = [];
-  let currentList = null;
-  let currentListType = null;
-
-  const flushList = () => {
-    if (currentList) {
-      const tag = currentListType === 'bullet' ? 'ul' : 'ol';
-      htmlParts.push(`<${tag}>${currentList.join('')}</${tag}>`);
-      currentList = null;
-      currentListType = null;
-    }
-  };
-
-  blocks.forEach(block => {
-    const rendered = renderBlock(block);
-    if (rendered && typeof rendered === 'object' && rendered._listItem) {
-      if (currentListType !== rendered._listItem) {
-        flushList();
-        currentList = [];
-        currentListType = rendered._listItem;
-      }
-      currentList.push(rendered.html);
-    } else {
-      flushList();
-      if (rendered) htmlParts.push(rendered);
-    }
+function renderBody(blocks=[]) {
+  _tocEntries=[];
+  const parts=[]; let list=null,listType=null;
+  const flush=()=>{ if(list){const t=listType==='bullet'?'ul':'ol'; parts.push(`<${t}>${list.join('')}</${t}>`); list=null;listType=null;} };
+  blocks.forEach(b=>{
+    const r=renderBlock(b);
+    if(r&&typeof r==='object'&&r._li){
+      if(listType!==r._li){flush();list=[];listType=r._li;}
+      list.push(r.html);
+    } else { flush(); if(r) parts.push(r); }
   });
-  flushList();
-  return htmlParts.join('\n');
+  flush();
+  return parts.join('\n');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SANITY FETCH
+// SANITY FETCHES
 // ─────────────────────────────────────────────────────────────────────────────
-
-async function fetchPost(slugValue) {
-  const query = encodeURIComponent(
-    `*[_type == "post" && slug.current == "${slugValue}"][0]{
-      _id, title, slug, publishedAt, category, tags, excerpt,
-      coverImage { asset, alt },
-      body[] {
-        ...,
-        _type == "image" => { ..., asset-> }
-      },
-      featured
-    }`
-  );
-  const res = await fetch(`${CDN}?query=${query}`);
-  if (!res.ok) throw new Error(`Sanity error: ${res.status}`);
-  const data = await res.json();
-  return data.result || null;
+async function fetchPost(slugVal) {
+  const q=encodeURIComponent(`*[_type=="post"&&slug.current=="${slugVal}"][0]{_id,title,slug,publishedAt,category,tags,excerpt,coverImage{asset,alt},body[]{...,_type=="image"=>{...,asset->}},featured}`);
+  const r=await fetch(`${CDN}?query=${q}`);
+  if(!r.ok) throw new Error(r.status);
+  return (await r.json()).result||null;
 }
 
-async function fetchAdjacentPosts(slugValue, publishedAt) {
-  const prevQuery = encodeURIComponent(
-    `*[_type == "post" && publishedAt < "${publishedAt}"] | order(publishedAt desc)[0]{ title, slug }`
-  );
-  const nextQuery = encodeURIComponent(
-    `*[_type == "post" && publishedAt > "${publishedAt}"] | order(publishedAt asc)[0]{ title, slug }`
-  );
-
-  const [prevRes, nextRes] = await Promise.all([
-    fetch(`${CDN}?query=${prevQuery}`),
-    fetch(`${CDN}?query=${nextQuery}`),
+async function fetchAdjacent(publishedAt) {
+  const [pr,nr]=await Promise.all([
+    fetch(`${CDN}?query=${encodeURIComponent(`*[_type=="post"&&publishedAt<"${publishedAt}"]|order(publishedAt desc)[0]{title,slug}`)}`),
+    fetch(`${CDN}?query=${encodeURIComponent(`*[_type=="post"&&publishedAt>"${publishedAt}"]|order(publishedAt asc)[0]{title,slug}`)}`),
   ]);
-  const prevData = await prevRes.json();
-  const nextData = await nextRes.json();
-  return {
-    prev: prevData.result || null,
-    next: nextData.result || null,
-  };
+  return {prev:(await pr.json()).result||null,next:(await nr.json()).result||null};
+}
+
+async function fetchMore(currentSlug, publishedAt) {
+  const q=encodeURIComponent(`*[_type=="post"&&slug.current!="${currentSlug}"]|order(publishedAt desc)[0..2]{_id,title,slug,publishedAt,category,coverImage{asset,alt},body}`);
+  const r=await fetch(`${CDN}?query=${q}`);
+  return (await r.json()).result||[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCROLL PROGRESS BAR
+// CARD RENDERER (reused from blog.js logic)
 // ─────────────────────────────────────────────────────────────────────────────
-
-function initScrollProgress() {
-  const fill = document.getElementById('post-progress-fill');
-  if (!fill) return;
-  const update = () => {
-    const scrollTop  = window.scrollY;
-    const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
-    const pct        = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
-    fill.style.width = pct + '%';
-    document.getElementById('post-progress')?.setAttribute('aria-valuenow', Math.round(pct));
-  };
-  window.addEventListener('scroll', update, { passive: true });
-  update();
+function miniCard(p) {
+  const url=imgUrl(p.coverImage?.asset?._ref,800);
+  const slug_=p.slug?.current||'';
+  const cat=CAT[p.category]||p.category||'';
+  let w=0; (p.body||[]).forEach(b=>b._type==='block'&&b.children?.forEach(s=>{if(s.text)w+=s.text.split(/\s+/).filter(Boolean).length;}));
+  const mins=Math.max(1,Math.ceil(w/238));
+  return `<a href="/post?slug=${encodeURIComponent(slug_)}" class="bl-card bl-card--small">
+    <div class="bl-card__bg" ${url?`style="background-image:url('${url}')"`:''}></div>
+    <div class="bl-card__overlay"></div>
+    <div class="bl-card__content">
+      <div class="bl-card__top">${cat?`<span class="bl-tag">${esc(cat)}</span>`:''}</div>
+      <div class="bl-card__bottom">
+        <h3 class="bl-card__title">${esc(p.title||'')}</h3>
+        <div class="bl-card__meta"><span>${fmtDate(p.publishedAt)}</span><span class="bl-card__dot">·</span><span>${mins} min read</span></div>
+        <div class="bl-card__arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M14.086 7.5L11.404 4.818 12.11 4.11 16 8l-3.89 3.89-.707-.707L14.086 8.5H0v-1h14.086z"/></svg></div>
+      </div>
+    </div>
+  </a>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TABLE OF CONTENTS — active section tracking
+// SCROLL PROGRESS
 // ─────────────────────────────────────────────────────────────────────────────
+function initProgress() {
+  const fill=document.getElementById('pt-progress-fill');
+  if(!fill) return;
+  const tick=()=>{
+    const scrolled=window.scrollY, total=document.documentElement.scrollHeight-window.innerHeight;
+    fill.style.width=(total>0?Math.min(100,scrolled/total*100):0)+'%';
+  };
+  window.addEventListener('scroll',tick,{passive:true}); tick();
+}
 
+// ─────────────────────────────────────────────────────────────────────────────
+// TABLE OF CONTENTS
+// ─────────────────────────────────────────────────────────────────────────────
 function buildTOC(entries) {
-  const tocList = document.getElementById('post-toc-list');
-  const tocEl   = document.getElementById('post-toc');
-  if (!tocList || !entries.length) {
-    if (tocEl) tocEl.hidden = true;
-    return;
-  }
-  tocEl.hidden = false;
+  const tocEl=document.getElementById('pt-toc');
+  const listEl=document.getElementById('pt-toc-list');
+  if(!listEl||!entries.length){if(tocEl)tocEl.hidden=true;return;}
 
-  tocList.innerHTML = entries.map(({ id, text, level }) =>
-    `<a href="#${id}" class="post-toc__item post-toc__item--h${level}" data-id="${id}">${esc(text)}</a>`
+  listEl.innerHTML=entries.map(({id,text,level})=>
+    `<a href="#${id}" class="pt-toc__link pt-toc__link--h${level}" data-id="${id}">${esc(text)}</a>`
   ).join('');
 
-  // Intersection observer for active section
-  const links = [...tocList.querySelectorAll('.post-toc__item')];
-  const headings = entries.map(e => document.getElementById(e.id)).filter(Boolean);
+  const links=[...listEl.querySelectorAll('.pt-toc__link')];
+  const headings=entries.map(e=>document.getElementById(e.id)).filter(Boolean);
 
-  if (!headings.length) return;
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        links.forEach(a => a.classList.toggle('is-active', a.dataset.id === id));
-      }
+  const obs=new IntersectionObserver(evts=>{
+    evts.forEach(ev=>{
+      if(ev.isIntersecting) links.forEach(a=>a.classList.toggle('is-active',a.dataset.id===ev.target.id));
     });
-  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  },{rootMargin:'0px 0px -65% 0px',threshold:0});
+  headings.forEach(h=>obs.observe(h));
 
-  headings.forEach(h => observer.observe(h));
-
-  // Click scrolls smoothly
-  tocList.addEventListener('click', e => {
-    const link = e.target.closest('.post-toc__item');
-    if (!link) return;
+  listEl.addEventListener('click',e=>{
+    const a=e.target.closest('.pt-toc__link');
+    if(!a){return;}
     e.preventDefault();
-    const target = document.getElementById(link.dataset.id);
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById(a.dataset.id)?.scrollIntoView({behavior:'smooth',block:'start'});
   });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SOCIAL SHARING
 // ─────────────────────────────────────────────────────────────────────────────
-
 function initSharing(title) {
-  const url = window.location.href;
-
-  document.getElementById('share-twitter')?.addEventListener('click', () => {
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
-      '_blank', 'noopener,noreferrer'
-    );
-  });
-
-  document.getElementById('share-linkedin')?.addEventListener('click', () => {
-    window.open(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-      '_blank', 'noopener,noreferrer'
-    );
-  });
-
-  const copyBtn   = document.getElementById('share-copy');
-  const copyLabel = document.getElementById('share-copy-label');
-  copyBtn?.addEventListener('click', async () => {
+  const url=window.location.href;
+  document.getElementById('share-twitter')?.addEventListener('click',()=>
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,'_blank','noopener'));
+  document.getElementById('share-linkedin')?.addEventListener('click',()=>
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,'_blank','noopener'));
+  const copyBtn=document.getElementById('share-copy');
+  const copyLabel=document.getElementById('share-copy-label');
+  copyBtn?.addEventListener('click',async()=>{
     try {
       await navigator.clipboard.writeText(url);
-      copyLabel.textContent = 'Copied!';
-      copyBtn.classList.add('is-copied');
-      setTimeout(() => {
-        copyLabel.textContent = 'Copy link';
-        copyBtn.classList.remove('is-copied');
-      }, 2000);
-    } catch {
-      copyLabel.textContent = 'Copy failed';
-      setTimeout(() => { copyLabel.textContent = 'Copy link'; }, 2000);
-    }
+      copyLabel.textContent='Copied!'; copyBtn.classList.add('is-copied');
+      setTimeout(()=>{copyLabel.textContent='Copy'; copyBtn.classList.remove('is-copied');},2000);
+    } catch { copyLabel.textContent='Failed'; setTimeout(()=>{copyLabel.textContent='Copy';},2000); }
   });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SEO META INJECTION
+// META INJECTION
 // ─────────────────────────────────────────────────────────────────────────────
-
-function injectMeta(post, canonicalUrl, ogImageUrl) {
-  document.title = `${post.title} — Melvyn Cross`;
-
-  const setMeta = (sel, val) => {
-    const el = document.querySelector(sel);
-    if (el) el.setAttribute(el.hasAttribute('content') ? 'content' : 'property', val);
-  };
-  const setMetaContent = (sel, val) => {
-    const el = document.querySelector(sel);
-    if (el) el.setAttribute('content', val);
-  };
-
-  setMetaContent('meta[name="description"]', post.excerpt || '');
-  setMetaContent('meta[property="og:url"]', canonicalUrl);
-  setMetaContent('meta[property="og:title"]', post.title);
-  setMetaContent('meta[property="og:description"]', post.excerpt || '');
-  if (ogImageUrl) setMetaContent('meta[property="og:image"]', ogImageUrl);
-  setMetaContent('meta[name="twitter:title"]', post.title);
-  setMetaContent('meta[name="twitter:description"]', post.excerpt || '');
-  if (ogImageUrl) setMetaContent('meta[name="twitter:image"]', ogImageUrl);
-
-  // JSON-LD
-  const ld = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.excerpt || '',
-    datePublished: post.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: 'Melvyn Cross',
-      url: 'https://melvyncross.com',
-    },
-    publisher: {
-      '@type': 'Person',
-      name: 'Melvyn Cross',
-    },
-    url: canonicalUrl,
-  };
-  if (ogImageUrl) ld.image = ogImageUrl;
-  document.getElementById('jsonld-article').textContent = JSON.stringify(ld);
+function injectMeta(post, canonicalUrl, ogImg) {
+  document.title=`${post.title} — Melvyn Cross`;
+  const set=(sel,val)=>{const el=document.querySelector(sel);if(el)el.setAttribute('content',val);};
+  set('meta[name="description"]',post.excerpt||'');
+  set('meta[property="og:url"]',canonicalUrl);
+  set('meta[property="og:title"]',post.title);
+  set('meta[property="og:description"]',post.excerpt||'');
+  if(ogImg){set('meta[property="og:image"]',ogImg);set('meta[name="twitter:image"]',ogImg);}
+  set('meta[name="twitter:title"]',post.title);
+  set('meta[name="twitter:description"]',post.excerpt||'');
+  document.getElementById('jsonld-article').textContent=JSON.stringify({
+    '@context':'https://schema.org','@type':'Article',
+    headline:post.title,description:post.excerpt||'',
+    datePublished:post.publishedAt,
+    author:{'@type':'Person',name:'Melvyn Cross',url:'https://melvyncross.com'},
+    url:canonicalUrl,...(ogImg?{image:ogImg}:{})
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DARK MODE
+// THEME
 // ─────────────────────────────────────────────────────────────────────────────
-
 function initTheme() {
-  const btn = document.getElementById('theme-toggle');
-  if (!btn) return;
-  const update = (theme) => {
-    document.documentElement.setAttribute('data-theme', theme);
-    btn.textContent = theme === 'dark' ? '☀' : '☽';
-    localStorage.setItem('mc_theme', theme);
-  };
-  update(document.documentElement.getAttribute('data-theme') || 'light');
-  btn.addEventListener('click', () => {
-    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    update(next);
-  });
+  const btn=document.getElementById('theme-toggle');
+  if(!btn) return;
+  const set=t=>{document.documentElement.setAttribute('data-theme',t);btn.textContent=t==='dark'?'☀':'☽';localStorage.setItem('mc_theme',t);};
+  set(document.documentElement.getAttribute('data-theme')||'light');
+  btn.addEventListener('click',()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RENDER POST
 // ─────────────────────────────────────────────────────────────────────────────
+function renderPost(post, adjacent, more) {
+  const canonical=window.location.href;
+  const coverRef=post.coverImage?.asset?._ref;
+  const coverUrl=coverRef?imgUrl(coverRef,1400):null;
+  const mins=readTime(post.body);
+  const catLabel=CAT[post.category]||post.category||'';
 
-function renderPost(post, adjacent) {
-  const canonicalUrl = window.location.href;
-  const readMin      = estimateReadTime(post.body);
-  const catLabel     = CATEGORY_LABELS[post.category] || post.category || '';
-  const coverRef     = post.coverImage?.asset?._ref;
-  const coverUrl     = coverRef ? sanityImageUrl(coverRef, 1400) : null;
+  injectMeta(post, canonical, coverUrl||'');
 
-  // SEO
-  injectMeta(post, canonicalUrl, coverUrl || '');
-
-  // Cover
-  const coverEl = document.getElementById('post-cover');
-  if (coverUrl && coverEl) {
-    coverEl.innerHTML = `<img class="post-cover__img" src="${coverUrl}" alt="${esc(post.coverImage?.alt || post.title)}" />`;
-  } else if (coverEl) {
-    coverEl.classList.add('post-cover--empty');
+  // Cover image
+  const coverEl=document.getElementById('pt-cover');
+  if(coverUrl&&coverEl) {
+    coverEl.style.backgroundImage=`url('${coverUrl}')`;
+    coverEl.style.backgroundSize='cover';
+    coverEl.style.backgroundPosition='center';
   }
 
   // Breadcrumb title
-  document.getElementById('breadcrumb-title').textContent = post.title;
+  document.getElementById('pt-breadcrumb-title').textContent=post.title;
 
-  // Category
-  const catEl = document.getElementById('post-cat');
-  if (catEl && catLabel) {
-    catEl.textContent = catLabel;
-    catEl.className = `post-header__cat post-header__cat--${post.category || 'other'}`;
-  }
-
-  // Tags
-  const tagsEl = document.getElementById('post-tags');
-  if (tagsEl && post.tags?.length) {
-    tagsEl.innerHTML = post.tags.map(t => `<span class="post-tag">${esc(t)}</span>`).join('');
-  }
+  // Category tag
+  const catEl=document.getElementById('pt-cat');
+  if(catEl&&catLabel){catEl.innerHTML=`<span class="bl-tag bl-tag--${post.category||'other'}">${esc(catLabel)}</span>`;}
 
   // Title
-  document.getElementById('post-title').textContent = post.title;
+  document.getElementById('pt-title').textContent=post.title;
 
   // Date + read time
-  document.getElementById('post-date').textContent = formatDate(post.publishedAt);
-  document.getElementById('post-date').setAttribute('datetime', post.publishedAt);
-  document.getElementById('post-read').textContent = `${readMin} min read`;
+  const dateEl=document.getElementById('pt-date');
+  dateEl.textContent=fmtDate(post.publishedAt); dateEl.setAttribute('datetime',post.publishedAt||'');
+  document.getElementById('pt-read').textContent=`${mins} min read`;
+
+  // Tags
+  const tagsEl=document.getElementById('pt-tags');
+  if(tagsEl&&post.tags?.length) tagsEl.innerHTML=post.tags.map(t=>`<span class="pt-tag">${esc(t)}</span>`).join('');
 
   // Body
-  const bodyEl = document.getElementById('post-body');
-  if (bodyEl) bodyEl.innerHTML = wrapBlocks(post.body || []);
+  const bodyEl=document.getElementById('pt-body');
+  if(bodyEl) bodyEl.innerHTML=renderBody(post.body||[]);
 
-  // TOC (built after body is rendered so headings have IDs)
-  buildTOC(tocEntries);
+  // TOC
+  buildTOC(_tocEntries);
 
   // Sharing
   initSharing(post.title);
 
   // Prev / Next
-  if (adjacent.prev) {
-    const prev = document.getElementById('post-nav-prev');
-    prev.href = `/post?slug=${encodeURIComponent(adjacent.prev.slug.current)}`;
-    document.getElementById('post-nav-prev-title').textContent = adjacent.prev.title;
-    prev.hidden = false;
+  if(adjacent.prev){
+    const el=document.getElementById('pt-nav-prev');
+    el.href=`/post?slug=${encodeURIComponent(adjacent.prev.slug.current)}`;
+    document.getElementById('pt-nav-prev-title').textContent=adjacent.prev.title;
+    el.hidden=false;
   }
-  if (adjacent.next) {
-    const next = document.getElementById('post-nav-next');
-    next.href = `/post?slug=${encodeURIComponent(adjacent.next.slug.current)}`;
-    document.getElementById('post-nav-next-title').textContent = adjacent.next.title;
-    next.hidden = false;
+  if(adjacent.next){
+    const el=document.getElementById('pt-nav-next');
+    el.href=`/post?slug=${encodeURIComponent(adjacent.next.slug.current)}`;
+    document.getElementById('pt-nav-next-title').textContent=adjacent.next.title;
+    el.hidden=false;
   }
 
-  // Show article, hide loading
-  document.getElementById('post-loading').hidden  = true;
-  document.getElementById('post-article').hidden  = false;
+  // More posts
+  const moreEl=document.getElementById('pt-more');
+  const moreGrid=document.getElementById('pt-more-grid');
+  if(more.length&&moreGrid){
+    moreGrid.innerHTML=more.map(miniCard).join('');
+  } else if(moreEl) {
+    moreEl.hidden=true;
+  }
 
-  // Scroll progress (activate after reveal)
-  initScrollProgress();
+  // Show
+  document.getElementById('pt-loading').hidden=true;
+  document.getElementById('pt-article').hidden=false;
+  initProgress();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN
 // ─────────────────────────────────────────────────────────────────────────────
-
 async function main() {
   initTheme();
+  const slugVal=new URLSearchParams(window.location.search).get('slug');
 
-  const params    = new URLSearchParams(window.location.search);
-  const slugValue = params.get('slug');
-
-  if (!slugValue) {
-    document.getElementById('post-loading').hidden  = true;
-    document.getElementById('post-notfound').hidden = false;
+  if(!slugVal){
+    document.getElementById('pt-loading').hidden=true;
+    document.getElementById('pt-notfound').hidden=false;
     return;
   }
 
   try {
-    const post = await fetchPost(slugValue);
-
-    if (!post) {
-      document.getElementById('post-loading').hidden  = true;
-      document.getElementById('post-notfound').hidden = false;
+    const post=await fetchPost(slugVal);
+    if(!post){
+      document.getElementById('pt-loading').hidden=true;
+      document.getElementById('pt-notfound').hidden=false;
       return;
     }
-
-    const adjacent = await fetchAdjacentPosts(slugValue, post.publishedAt);
-    renderPost(post, adjacent);
-
-  } catch (err) {
-    console.error('[post.js]', err);
-    document.getElementById('post-loading').hidden    = true;
-    document.getElementById('post-fetcherror').hidden = false;
+    const [adjacent,more]=await Promise.all([fetchAdjacent(post.publishedAt),fetchMore(slugVal,post.publishedAt)]);
+    renderPost(post,adjacent,more);
+  } catch(e) {
+    console.error('[post]',e);
+    document.getElementById('pt-loading').hidden=true;
+    document.getElementById('pt-fetcherror').hidden=false;
   }
 }
 
