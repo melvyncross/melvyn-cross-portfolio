@@ -2777,6 +2777,387 @@ html { scroll-behavior: smooth; }
 }
 
 /* ============================================================
+   QUALIFICATIONS PAGE
+   ============================================================ */
+
+/* ── Hero: cream bg + amber top-rule (inverted from edu's navy hero) ── */
+.qua-hero {
+  background: var(--cream);
+  padding: clamp(7rem, 14vw, 14rem) var(--pad-x) clamp(3.5rem, 6vw, 6rem);
+  border-top: 3px solid var(--amber);
+  position: relative;
+}
+[data-theme="dark"] .qua-hero { background: #171614; border-top-color: var(--amber); }
+
+.qua-hero__inner { max-width: 70rem; margin: 0 auto; }
+
+.qua-hero__pre {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+[data-theme="dark"] .qua-hero__pre { color: var(--amber); }
+.qua-hero__pre::after {
+  content: '';
+  display: block;
+  flex: 1;
+  max-width: 4rem;
+  height: 1px;
+  background: var(--amber-deep);
+  opacity: 0.5;
+}
+[data-theme="dark"] .qua-hero__pre::after { background: var(--amber); }
+
+.qua-hero__title {
+  font-family: var(--display);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 500;
+  font-variation-settings: "opsz" 60, "SOFT" 20;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--paper-text);
+  margin-bottom: 1.25rem;
+}
+[data-theme="dark"] .qua-hero__title { color: var(--ink-text); }
+.qua-hero__title em {
+  font-style: italic;
+  color: var(--amber-deep);
+  font-variation-settings: "opsz" 60, "SOFT" 80;
+}
+[data-theme="dark"] .qua-hero__title em { color: var(--amber); }
+
+.qua-hero__sub {
+  font-family: var(--body);
+  font-size: 1.05rem;
+  color: var(--paper-mute);
+  max-width: 34rem;
+  line-height: 1.65;
+}
+[data-theme="dark"] .qua-hero__sub { color: var(--ink-mute); }
+
+.qua-hero__strip {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+}
+[data-theme="dark"] .qua-hero__strip { border-top-color: var(--rule); }
+
+.qua-hero__stat {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+}
+[data-theme="dark"] .qua-hero__stat { color: var(--ink-mute); }
+.qua-hero__stat strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: var(--paper-text);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+[data-theme="dark"] .qua-hero__stat strong { color: var(--ink-text); }
+
+/* ── Body: cream-deep bg (different from edu's plain cream) ── */
+.qua-body {
+  background: var(--cream-deep);
+  padding: var(--section) var(--pad-x);
+}
+[data-theme="dark"] .qua-body { background: #1a1816; }
+.qua-body__inner { max-width: 70rem; margin: 0 auto; }
+
+/* ── Section eyebrow ── */
+.qua-section-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+[data-theme="dark"] .qua-section-label { color: var(--ink-mute); }
+.qua-section-label::before, .qua-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ── Card grid (3-col → differs from edu's stacked articles) ── */
+.qua-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── Cert card ── */
+.qua-card {
+  background: var(--cream);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+[data-theme="dark"] .qua-card { background: #222019; border-color: rgba(205,204,202,0.1); }
+.qua-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(10,22,40,0.1);
+}
+[data-theme="dark"] .qua-card:hover { box-shadow: 0 16px 48px rgba(0,0,0,0.45); }
+
+/* Coming-soon card: muted, no hover lift */
+.qua-card--soon { opacity: 0.78; }
+.qua-card--soon:hover { transform: none; box-shadow: none; }
+
+/* ── Blurred certificate at top of card ── */
+.qua-cert {
+  position: relative;
+  background: var(--cream-deep);
+  aspect-ratio: 1.55 / 1;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .qua-cert { background: rgba(245,237,224,0.04); }
+
+.qua-cert__doc {
+  position: absolute; inset: 0;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+}
+.qua-cert__seal {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--paper-mute);
+  opacity: 0.4;
+}
+.qua-cert__line {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--paper-mute);
+  opacity: 0.22;
+}
+.qua-cert__line--wide  { width: 55%; }
+.qua-cert__line--med   { width: 42%; }
+.qua-cert__line--short { width: 28%; }
+.qua-cert__line--thin  { height: 3px; opacity: 0.13; }
+
+.qua-cert__overlay {
+  position: absolute; inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(245, 237, 224, 0.68);
+  backdrop-filter: blur(3px);
+  text-align: center;
+  padding: 1rem;
+}
+[data-theme="dark"] .qua-cert__overlay { background: rgba(23,22,20,0.72); }
+
+/* Coming-soon overlay: crosshatch stripe pattern */
+.qua-cert__overlay--soon {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(245,237,224,0.5) 0px,
+    rgba(245,237,224,0.5) 8px,
+    rgba(234,224,206,0.3) 8px,
+    rgba(234,224,206,0.3) 16px
+  );
+}
+[data-theme="dark"] .qua-cert__overlay--soon {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(23,22,20,0.6) 0px,
+    rgba(23,22,20,0.6) 8px,
+    rgba(30,28,26,0.4) 8px,
+    rgba(30,28,26,0.4) 16px
+  );
+}
+
+.qua-cert__lock { font-size: 1.2rem; line-height: 1; }
+.qua-cert__note {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+  max-width: 9rem;
+  line-height: 1.5;
+}
+[data-theme="dark"] .qua-cert__note { color: var(--ink-mute); }
+.qua-cert__cta {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--amber-deep);
+  border-radius: 100px;
+  transition: background 0.2s, color 0.2s;
+  display: inline-block;
+}
+[data-theme="dark"] .qua-cert__cta { color: var(--amber); border-color: var(--amber); }
+.qua-cert__cta:hover { background: var(--amber-deep); color: var(--cream); }
+[data-theme="dark"] .qua-cert__cta:hover { background: var(--amber); color: #0A1628; }
+
+/* ── Card body (below cert image) ── */
+.qua-card__body {
+  padding: 1.35rem 1.35rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Issuer row */
+.qua-issuer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.qua-issuer-badge {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.qua-issuer-badge--hs  { background: #FF7A59; color: #fff; }
+.qua-issuer-badge--ga  { background: #E8710A; color: #fff; }
+.qua-issuer-badge--pmi { background: var(--ink); color: var(--cream); }
+[data-theme="dark"] .qua-issuer-badge--pmi { background: rgba(245,237,224,0.15); color: var(--cream); }
+
+.qua-issuer-name {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+}
+[data-theme="dark"] .qua-issuer-name { color: var(--ink-mute); }
+
+/* Cert title */
+.qua-card__name {
+  font-family: var(--display);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 500;
+  font-variation-settings: "opsz" 18, "SOFT" 20;
+  color: var(--paper-text);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+[data-theme="dark"] .qua-card__name { color: var(--ink-text); }
+
+/* Skills */
+.qua-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.qua-skill {
+  font-family: var(--mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  background: var(--cream-deep);
+  color: var(--paper-mute);
+  border-radius: 4px;
+}
+[data-theme="dark"] .qua-skill { background: rgba(245,237,224,0.07); color: var(--ink-mute); }
+
+/* Status chip + CTA row */
+.qua-card__foot {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+[data-theme="dark"] .qua-card__foot { border-top-color: rgba(205,204,202,0.12); }
+
+.qua-status {
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+}
+.qua-status--certified {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+[data-theme="dark"] .qua-status--certified {
+  background: rgba(34,197,94,0.1);
+  color: #4ade80;
+  border-color: rgba(34,197,94,0.2);
+}
+.qua-status--soon {
+  background: rgba(244,165,71,0.12);
+  color: var(--amber-deep);
+  border: 1px solid rgba(244,165,71,0.3);
+}
+[data-theme="dark"] .qua-status--soon { color: var(--amber); border-color: rgba(244,165,71,0.25); }
+
+.qua-card__link {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  transition: opacity 0.2s;
+}
+[data-theme="dark"] .qua-card__link { color: var(--amber); }
+.qua-card__link:hover { opacity: 0.65; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .qua-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .qua-grid { grid-template-columns: 1fr; }
+  .qua-hero__strip { gap: 1.5rem; }
+}
+
+/* ============================================================
    RESPONSIVE — BLOG + POST
    ============================================================ */
 @media (max-width: 900px) {
