@@ -122,15 +122,25 @@ em { font-style: italic; }
 .nav {
   position: fixed; top: 0; left: 0; right: 0;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 1.25rem var(--pad-x);
-  z-index: 100;
+  padding: 1.1rem var(--pad-x);
+  z-index: 200;
   font-family: var(--mono);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  mix-blend-mode: difference;
-  color: #ffffff;
+  /* Frosted glass — readable on any section colour, light or dark */
+  background: rgba(245, 237, 224, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(10, 22, 40, 0.07);
+  color: var(--paper-text);
   pointer-events: none;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+[data-theme="dark"] .nav {
+  background: rgba(20, 19, 18, 0.92);
+  border-bottom-color: rgba(245, 237, 224, 0.07);
+  color: var(--ink-text);
 }
 .nav a, .nav__meta { pointer-events: auto; }
 .nav__mark {
@@ -1399,13 +1409,7 @@ em { font-style: italic; }
   color: var(--cream);
 }
 
-/* Nav on blog/post pages — light: ink on cream; dark: cream on navy */
-.blog-nav { mix-blend-mode: normal; color: var(--ink); }
-[data-theme="dark"] .blog-nav { color: var(--cream); }
-.blog-nav .nav__mark { color: var(--ink); }
-[data-theme="dark"] .blog-nav .nav__mark { color: var(--cream); }
-.blog-nav .nav__theme { color: var(--ink); }
-[data-theme="dark"] .blog-nav .nav__theme { color: var(--cream); }
+/* .blog-nav — colour overrides removed; frosted-glass base .nav handles all pages */
 
 .nav__blog-link {
   font-family: var(--mono);
