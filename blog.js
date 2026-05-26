@@ -74,6 +74,21 @@ function initTheme() {
   btn.addEventListener('click',()=>set(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 }
 
+// ── scroll reveal ─────────────────────────────────────────────────────────────
+function initReveal() {
+  const items = document.querySelectorAll('.bl-reveal');
+  if (!items.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.06 });
+  items.forEach(el => obs.observe(el));
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 async function main() {
   initTheme();
@@ -90,14 +105,22 @@ async function main() {
 
     if (!posts.length) { empty.hidden=false; featCard.outerHTML='<div class="bl-card bl-card--featured bl-card--empty"></div>'; return; }
 
-    // Featured = first post
+    // Featured = first post (animate in via CSS)
     featCard.outerHTML = card(posts[0], 'featured');
 
-    // Rest in grid
+    // Rest in grid — staggered scroll reveal
     if (posts.length > 1) {
-      grid.innerHTML = posts.slice(1).map(p=>card(p,'small')).join('');
+      grid.innerHTML = posts.slice(1).map((p, i) => {
+        const delay = `${(i % 3) * 0.1}s`; // stagger within each row
+        return card(p, 'small').replace(
+          `class="bl-card bl-card--small"`,
+          `class="bl-card bl-card--small bl-reveal" style="--bl-delay:${delay}"`
+        );
+      }).join('');
       grid.hidden = false;
     }
+
+    requestAnimationFrame(initReveal);
 
   } catch(e) {
     console.error('[blog]',e);

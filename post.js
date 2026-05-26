@@ -162,6 +162,27 @@ function initProgress() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// COVER PARALLAX — image drifts slightly as user scrolls
+// ─────────────────────────────────────────────────────────────────────────────
+function initCoverParallax() {
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cover=document.getElementById('pt-cover');
+  if(!cover) return;
+  let raf=null;
+  const update=()=>{
+    const rect=cover.getBoundingClientRect();
+    if(rect.bottom<0||rect.top>window.innerHeight){raf=null;return;}
+    // progress 0 (cover top at viewport bottom) → 1 (cover bottom at viewport top)
+    const prog=(window.innerHeight-rect.top)/(window.innerHeight+rect.height);
+    const offset=Math.round((prog-0.5)*40); // ±20px shift
+    cover.style.backgroundPositionY=`calc(50% + ${offset}px)`;
+    raf=null;
+  };
+  window.addEventListener('scroll',()=>{ if(!raf) raf=requestAnimationFrame(update); },{passive:true});
+  update();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TABLE OF CONTENTS
 // ─────────────────────────────────────────────────────────────────────────────
 function buildTOC(entries) {
@@ -311,7 +332,16 @@ function renderPost(post, adjacent, more) {
   const moreEl=document.getElementById('pt-more');
   const moreGrid=document.getElementById('pt-more-grid');
   if(more.length&&moreGrid){
-    moreGrid.innerHTML=more.map(miniCard).join('');
+    moreGrid.innerHTML=more.map((p,i)=>miniCard(p).replace(
+      `class="bl-card bl-card--small"`,
+      `class="bl-card bl-card--small bl-reveal" style="--bl-delay:${i*0.1}s"`
+    )).join('');
+    requestAnimationFrame(()=>{
+      moreGrid.querySelectorAll('.bl-reveal').forEach(el=>{
+        const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-visible');obs.unobserve(e.target);}});},{threshold:0.06});
+        obs.observe(el);
+      });
+    });
   } else if(moreEl) {
     moreEl.hidden=true;
   }
@@ -320,7 +350,50 @@ function renderPost(post, adjacent, more) {
   document.getElementById('pt-loading').hidden=true;
   document.getElementById('pt-article').hidden=false;
   initProgress();
+  initCoverParallax();
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEMO POST — hardcoded sample for design preview at /post?slug=__demo__
+// ─────────────────────────────────────────────────────────────────────────────
+const DEMO_POST = {
+  _id:'demo',
+  title:'Why AI Won\'t Kill E-Commerce — It Will Reinvent It',
+  slug:{current:'__demo__'},
+  publishedAt:'2026-05-26T09:00:00Z',
+  category:'ecommerce',
+  tags:['AI','E-Commerce','Strategy','Retail'],
+  excerpt:'The hype cycle is in full swing. Here\'s what\'s actually happening beneath the surface of AI-powered shopping — and why the best operators are already three steps ahead.',
+  coverImage:{
+    asset:{_ref:'image-demo'},
+    alt:'Digital storefront with AI interface overlay'
+  },
+  featured:true,
+  body:[
+    {_type:'block',style:'normal',_key:'a1',children:[{_type:'span',text:'The hype cycle is at full throttle. Every week brings another headline about AI replacing search, AI replacing checkout, AI replacing the customer service team entirely. Most of it is noise. But underneath the noise, something real is shifting — and the operators who understand it are quietly building an enormous lead.'}]},
+    {_type:'block',style:'h2',_key:'a2',children:[{_type:'span',text:'The Three Waves of AI in Retail'}]},
+    {_type:'block',style:'normal',_key:'a3',children:[{_type:'span',text:'The first wave was recommendation engines. Netflix, Spotify, Amazon — all built on the insight that predicting what someone wants next is worth more than any single transaction. The second wave was demand forecasting and logistics optimisation: the invisible machinery that means your order arrives tomorrow instead of next week.'}]},
+    {_type:'block',style:'normal',_key:'a4',children:[{_type:'span',text:'We\'re entering the third wave, and it\'s qualitatively different from the first two. The first two waves made existing processes faster. This wave is changing what processes exist at all.'}]},
+    {_type:'block',style:'blockquote',_key:'a5',children:[{_type:'span',text:'The brands winning in five years won\'t be the ones who adopted AI earliest. They\'ll be the ones who reimagined their customer relationships around what AI makes newly possible.'}]},
+    {_type:'block',style:'h2',_key:'a6',children:[{_type:'span',text:'What Actually Changes at the Checkout'}]},
+    {_type:'block',style:'normal',_key:'a7',children:[{_type:'span',text:'The most interesting territory right now isn\'t the front-end chatbot. Everyone has a chatbot. The interesting territory is in how AI changes the economics of personalisation at scale.'}]},
+    {_type:'block',style:'normal',_key:'a8',children:[{_type:'span',text:'Consider dynamic bundling. For years, bundles were a blunt instrument — merchandisers would build a handful of curated sets, run them for a season, measure attachment rates, iterate slowly. With AI, every customer session can generate a bundle tailored to that specific basket in real time, priced to the margin target, offered at exactly the right moment in the journey.'}]},
+    {_type:'block',style:'h3',_key:'a9',children:[{_type:'span',text:'The Margin Arithmetic'}]},
+    {_type:'block',style:'normal',_key:'a10',children:[{_type:'span',text:'This matters because e-commerce margins are structurally thin. The average Shopify store runs at 10–20% gross margin after COGS. Take out fulfilment, returns, and paid acquisition and most direct-to-consumer brands are fighting over single-digit net margins.'}]},
+    {_type:'block',style:'normal',_key:'a11',children:[{_type:'span',text:'AI-driven personalisation doesn\'t just increase AOV — it reduces the acquisition cost per profitable order. Those are two very different levers, and they compound.'}]},
+    {_type:'block',style:'h2',_key:'a12',children:[{_type:'span',text:'Three Things You Should Be Doing Right Now'}]},
+    {_type:'block',style:'normal',_key:'b1',children:[{_type:'span',text:'Rather than a sweeping roadmap, here are the three highest-leverage moves for any mid-market operator:'}]},
+    {_type:'block',_key:'b2',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Audit your zero-party data strategy. The AI models that will win at personalisation need signal. Email open rates are not signal. Purchase history, explicit preference capture, and post-purchase surveys are signal. Start collecting it deliberately.'}]},
+    {_type:'block',_key:'b3',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Run a held-out test on your email and SMS cadences using an AI copy tool. Don\'t replace your copywriter — give them a co-pilot. Measure lift in click-to-purchase rate, not vanity open rates.'}]},
+    {_type:'block',_key:'b4',style:'normal',listItem:'bullet',children:[{_type:'span',text:'Map your customer service ticket categories and identify the top three by volume that could be resolved in a single AI-assisted interaction. Route those to a well-prompted LLM. Measure CSAT before and after.'}]},
+    {_type:'block',style:'h3',_key:'b5',children:[{_type:'span',text:'The Honest Caveat'}]},
+    {_type:'block',style:'normal',_key:'b6',children:[{_type:'span',text:'None of this is magic. AI amplifies what\'s already there. If your product is mediocre, AI will help you sell mediocre product to more people more efficiently — until retention craters and your LTV model falls apart. The fundamentals still matter. Product, price, and trust are not features AI can generate for you.'}]},
+    {_type:'block',style:'normal',_key:'b7',children:[{_type:'span',text:'But if you\'re already doing the fundamentals right, AI is the best margin-expansion opportunity this industry has seen since mobile. The operators who treat it as a tool rather than a strategy will extract meaningful value. The ones waiting for a turnkey solution will still be waiting when the window closes.'}]},
+  ]
+};
+
+// Override cover image for demo — use a direct URL
+const DEMO_COVER_URL = 'https://images.unsplash.com/photo-1557821552-17105176677c?w=1400&auto=format&fit=crop&q=80&sat=-15';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN
@@ -332,6 +405,20 @@ async function main() {
   if(!slugVal){
     document.getElementById('pt-loading').hidden=true;
     document.getElementById('pt-notfound').hidden=false;
+    return;
+  }
+
+  // Demo mode — renders without Sanity
+  if(slugVal==='__demo__'){
+    const post=DEMO_POST;
+    const cover=document.getElementById('pt-cover');
+    if(cover){ cover.style.backgroundImage=`url('${DEMO_COVER_URL}')`; cover.style.backgroundSize='cover'; cover.style.backgroundPosition='center'; }
+    // Patch imgUrl for demo so cover ref doesn't break
+    const _orig=window.__demoMode;
+    renderPost(post,{prev:null,next:null},[]);
+    // Fix cover (renderPost uses coverImage ref, override after)
+    const c=document.getElementById('pt-cover');
+    if(c){ c.style.backgroundImage=`url('${DEMO_COVER_URL}')`; c.style.backgroundSize='cover'; c.style.backgroundPosition='center'; }
     return;
   }
 
