@@ -112,6 +112,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 img, svg { display: block; max-width: 100%; }
+[hidden] { display: none !important; }
 a { color: inherit; text-decoration: none; }
 em { font-style: italic; }
 
