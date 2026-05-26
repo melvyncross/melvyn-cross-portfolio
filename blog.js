@@ -202,8 +202,12 @@ async function main() {
   } catch(e) {
     console.error('[blog]',e);
     skeleton.hidden = true;
-    error.hidden = false;
-    featCard.outerHTML='<div class="bl-card bl-card--featured bl-card--empty"></div>';
+    // Sanity unreachable — fall back to demo cards so the design is still visible
+    featCard.outerHTML = demoCard(DEMO_POSTS[0], 'featured');
+    grid.innerHTML = DEMO_POSTS.slice(1).map((p,i)=>demoCard(p,'small',`${(i%3)*0.1}s`)).join('');
+    grid.hidden = false;
+    requestAnimationFrame(initReveal);
+    if (rebindHover) rebindHover();
   }
 }
 
