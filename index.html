@@ -432,6 +432,42 @@
         <span data-i18n="contact_cv">Download CV (PDF)</span>
         <span class="contact__cv-arrow">↓</span>
       </a>
+
+      <!-- ── Contact form ── -->
+      <div class="cf-wrap" id="cf-wrap">
+        <p class="cf-eyebrow">Or send a message directly</p>
+
+        <form class="cf" id="cf" novalidate>
+          <div class="cf__row">
+            <label class="cf__label" for="cf-name">Name</label>
+            <input class="cf__input" type="text" id="cf-name" name="name"
+              placeholder="Your name" autocomplete="name" required />
+          </div>
+          <div class="cf__row">
+            <label class="cf__label" for="cf-email">Email</label>
+            <input class="cf__input" type="email" id="cf-email" name="email"
+              placeholder="your@email.com" autocomplete="email" required />
+          </div>
+          <div class="cf__row">
+            <label class="cf__label" for="cf-msg">Message</label>
+            <textarea class="cf__input cf__textarea" id="cf-msg" name="message"
+              placeholder="What's on your mind?" rows="4" required></textarea>
+          </div>
+
+          <div class="cf__actions">
+            <button class="cf__submit" id="cf-submit" type="submit">
+              <span id="cf-btn-text">Send message</span>
+              <span class="cf__arrow">→</span>
+            </button>
+            <p class="cf__error" id="cf-error" hidden></p>
+          </div>
+        </form>
+
+        <div class="cf__success" id="cf-success" hidden>
+          <p class="cf__success-msg">Message sent.<br><em>I'll be in touch.</em></p>
+        </div>
+      </div>
+
     </div>
   </section>
 

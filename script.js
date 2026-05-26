@@ -570,3 +570,58 @@ import content from './content.js';
     console.warn('[latest-posts]', e.message);
   }
 })();
+
+/* ──────────────────────────────────────────────────────────────────
+   CONTACT FORM
+   Submits to /api/contact (Vercel serverless → Resend).
+   No page reload. Loading/success/error states handled inline.
+   ────────────────────────────────────────────────────────────────── */
+(() => {
+  const form    = document.getElementById('cf');
+  if (!form) return;
+
+  const btnEl   = document.getElementById('cf-submit');
+  const btnText = document.getElementById('cf-btn-text');
+  const errorEl = document.getElementById('cf-error');
+  const success = document.getElementById('cf-success');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const name    = document.getElementById('cf-name').value.trim();
+    const email   = document.getElementById('cf-email').value.trim();
+    const message = document.getElementById('cf-msg').value.trim();
+
+    // Client-side guard — prevents unnecessary round-trip
+    if (!name || !email || !message) {
+      errorEl.textContent = 'Please fill in all fields.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    // Sending state
+    btnEl.disabled   = true;
+    btnText.textContent = 'Sending…';
+    errorEl.hidden   = true;
+
+    try {
+      const res  = await fetch('/api/contact', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, message }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+
+      // Success — hide form, show confirmation
+      form.hidden    = true;
+      success.hidden = false;
+
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.hidden      = false;
+      btnEl.disabled      = false;
+      btnText.textContent = 'Send message';
+    }
+  });
+})();
