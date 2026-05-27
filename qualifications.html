@@ -41,21 +41,21 @@
   <!-- ── HERO: cream bg + amber top-rule — distinct from edu's navy hero ── -->
   <section class="qua-hero">
     <div class="qua-hero__inner">
-      <p class="qua-hero__pre">Professional credentials</p>
-      <h1 class="qua-hero__title">My <em>qualifications</em>.</h1>
-      <p class="qua-hero__sub">Certified skills that back the work — from CRM management and analytics to project delivery. Plus one more on the way.</p>
+      <p class="qua-hero__pre" data-i18n="qua_hero_pre">Professional credentials</p>
+      <h1 class="qua-hero__title" data-i18n="qua_hero_title">My <em>qualifications</em>.</h1>
+      <p class="qua-hero__sub" data-i18n="qua_hero_sub">Certified skills that back the work — from CRM management and analytics to project delivery. Plus one more on the way.</p>
       <div class="qua-hero__strip">
         <div class="qua-hero__stat">
-          <strong>2</strong>
-          Active certifications
+          <strong data-i18n="qua_hero_stat1_num">2</strong>
+          <span data-i18n="qua_hero_stat1_txt">Active certifications</span>
         </div>
         <div class="qua-hero__stat">
-          <strong>1</strong>
-          In progress
+          <strong data-i18n="qua_hero_stat2_num">1</strong>
+          <span data-i18n="qua_hero_stat2_txt">In progress</span>
         </div>
         <div class="qua-hero__stat">
-          <strong>3+</strong>
-          Platforms covered
+          <strong data-i18n="qua_hero_stat3_num">3+</strong>
+          <span data-i18n="qua_hero_stat3_txt">Platforms covered</span>
         </div>
       </div>
     </div>
@@ -88,9 +88,9 @@
               <span class="qua-issuer-name">HubSpot Academy</span>
             </div>
 
-            <h2 class="qua-card__name">Digital Marketing Certified</h2>
+            <h2 class="qua-card__name" data-i18n="qua_hs_name">Digital Marketing Certified</h2>
 
-            <div class="qua-skills">
+            <div class="qua-skills" data-skills="qua_hs_skills">
               <span class="qua-skill">CRM Management</span>
               <span class="qua-skill">Lead Nurturing</span>
               <span class="qua-skill">Email Marketing</span>
@@ -123,9 +123,9 @@
               <span class="qua-issuer-name">Google</span>
             </div>
 
-            <h2 class="qua-card__name">Google Analytics (GA4) Certification</h2>
+            <h2 class="qua-card__name" data-i18n="qua_ga_name">Google Analytics (GA4) Certification</h2>
 
-            <div class="qua-skills">
+            <div class="qua-skills" data-skills="qua_ga_skills">
               <span class="qua-skill">GA4</span>
               <span class="qua-skill">Conversion Tracking</span>
               <span class="qua-skill">Audience Analysis</span>
@@ -166,9 +166,9 @@
               <span class="qua-issuer-name">Project Management Institute</span>
             </div>
 
-            <h2 class="qua-card__name">PMI Project Management Professional</h2>
+            <h2 class="qua-card__name" data-i18n="qua_pmi_name">PMI Project Management Professional</h2>
 
-            <div class="qua-skills">
+            <div class="qua-skills" data-skills="qua_pmi_skills">
               <span class="qua-skill">Project Planning</span>
               <span class="qua-skill">Risk Management</span>
               <span class="qua-skill">Agile / Scrum</span>
@@ -178,7 +178,7 @@
             </div>
 
             <div class="qua-card__foot">
-              <span class="qua-status qua-status--soon">Coming soon</span>
+              <span class="qua-status qua-status--soon" data-i18n="qua_pmi_status">Coming soon</span>
             </div>
           </div>
         </div>
@@ -285,6 +285,7 @@
       tick();
     })();
   </script>
+  <script type="module" src="qua-content.js"></script>
   <script src="page-transition.js"></script>
   <script src="cookie-consent.js"></script>
   <script src="ftr-subscribe.js"></script>

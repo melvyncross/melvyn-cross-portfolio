@@ -3,6 +3,16 @@
  * Alec-template-inspired editorial design.
  */
 
+// ── Page chrome hydration (hero title + description from Sanity) ─────────────
+import content from './content.js';
+(function () {
+  const s = content['en'];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (s && s[key] != null && s[key] !== '') el.innerHTML = s[key];
+  });
+})();
+
 const PROJECT_ID = 'p4gxllem';
 const DATASET    = 'production';
 const CDN        = `https://${PROJECT_ID}.apicdn.sanity.io/v2024-01-01/data/query/${DATASET}`;

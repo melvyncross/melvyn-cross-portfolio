@@ -15,18 +15,54 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
-            // Singleton — one document, always the same _id
+            // ── PAGE SINGLETONS ──────────────────────────────────────────
             S.listItem()
-              .title('Portfolio Content')
+              .title('Homepage')
               .id('siteContent')
               .child(
                 S.document()
                   .schemaType('portfolioContent')
                   .documentId('siteContent')
-                  .title('Portfolio Content')
+                  .title('Homepage')
+              ),
+            S.listItem()
+              .title('Education Page')
+              .id('educationContent')
+              .child(
+                S.document()
+                  .schemaType('educationContent')
+                  .documentId('educationContent')
+                  .title('Education Page')
+              ),
+            S.listItem()
+              .title('Qualifications Page')
+              .id('qualificationsContent')
+              .child(
+                S.document()
+                  .schemaType('qualificationsContent')
+                  .documentId('qualificationsContent')
+                  .title('Qualifications Page')
+              ),
+            S.listItem()
+              .title('Contact Page')
+              .id('contactPageContent')
+              .child(
+                S.document()
+                  .schemaType('contactPageContent')
+                  .documentId('contactPageContent')
+                  .title('Contact Page')
+              ),
+            S.listItem()
+              .title('Blog Page (The Dispatch)')
+              .id('blogPageContent')
+              .child(
+                S.document()
+                  .schemaType('blogPageContent')
+                  .documentId('blogPageContent')
+                  .title('Blog Page (The Dispatch)')
               ),
             S.divider(),
-            // Blog posts — list with newest first
+            // ── BLOG POSTS ───────────────────────────────────────────────
             S.listItem()
               .title('Blog Posts')
               .schemaType('post')

@@ -2,10 +2,10 @@
  * fetch-content.js — Melvyn Cross Portfolio
  *
  * Runs at Vercel build time (buildCommand in vercel.json).
- * Fetches the portfolio content document from Sanity CMS and writes
+ * Fetches all singleton content documents from Sanity CMS and writes
  * a fresh content.js to the project root.
  *
- * If Sanity is unreachable or the document doesn't exist yet, exits cleanly
+ * If Sanity is unreachable or a document doesn't exist yet, exits cleanly
  * so Vercel falls back to the committed content.js (no build failure).
  *
  * Usage:
@@ -44,25 +44,38 @@ const client = createClient({
 async function main() {
   console.log(`[fetch-content] Fetching from Sanity (project: ${PROJECT_ID}, dataset: ${DATASET})…`);
 
-  let doc;
+  let doc, eduDoc, quaDoc, cpDoc, blDoc;
   try {
-    doc = await client.fetch(`*[_id == "siteContent"][0]`);
+    [doc, eduDoc, quaDoc, cpDoc, blDoc] = await Promise.all([
+      client.fetch(`*[_id == "siteContent"][0]`),
+      client.fetch(`*[_id == "educationContent"][0]`),
+      client.fetch(`*[_id == "qualificationsContent"][0]`),
+      client.fetch(`*[_id == "contactPageContent"][0]`),
+      client.fetch(`*[_id == "blogPageContent"][0]`),
+    ]);
   } catch (err) {
     console.warn('[fetch-content] Sanity fetch failed — using committed fallback content.js');
     console.warn('[fetch-content]', err.message);
-    process.exit(0); // clean exit: Vercel uses the committed content.js
-  }
-
-  if (!doc) {
-    console.warn('[fetch-content] No content document found in Sanity yet — using committed fallback content.js');
-    console.warn('[fetch-content] Seed the document via: cd studio && npm run dev → create Portfolio Content document');
     process.exit(0);
   }
 
-  // Helper: safely retrieve a localized string, empty string if missing
-  const loc = (field, lang) => (doc[field] && doc[field][lang]) != null
-    ? doc[field][lang]
+  if (!doc) {
+    console.warn('[fetch-content] No homepage content document found in Sanity yet — using fallback content.js');
+    process.exit(0);
+  }
+
+  // Helper: safely retrieve a localized field from any document
+  const locFrom = (d, field, lang) => (d && d[field] && d[field][lang]) != null
+    ? d[field][lang]
     : '';
+  // Convenience wrappers per document
+  const loc    = (field, lang) => locFrom(doc, field, lang);
+  const edu    = (field, lang) => locFrom(eduDoc, field, lang);
+  const qua    = (field, lang) => locFrom(quaDoc, field, lang);
+  // Contact page has a mix of localized and plain string fields
+  const cpLoc  = (field, lang) => locFrom(cpDoc, field, lang);
+  const cpStr  = (field) => (cpDoc && cpDoc[field] != null) ? cpDoc[field] : '';
+  const bl     = (field, lang) => locFrom(blDoc, field, lang);
 
   const generated = `/* ============================================================
    MELVYN CROSS — CONTENT LAYER  (auto-generated)
@@ -150,6 +163,63 @@ const content = {
     /* ── PORTRAIT ── */
     portrait_alt: ${JSON.stringify(loc('portrait_alt', 'en'))},
     portrait_placeholder: ${JSON.stringify(loc('portrait_placeholder', 'en'))},
+
+    /* ── EDUCATION PAGE ── */
+    edu_hero_pre: ${JSON.stringify(edu('edu_hero_pre', 'en'))},
+    edu_hero_title: ${JSON.stringify(edu('edu_hero_title', 'en'))},
+    edu_hero_sub: ${JSON.stringify(edu('edu_hero_sub', 'en'))},
+    edu_hero_stat1_num: ${JSON.stringify(edu('edu_hero_stat1_num', 'en'))},
+    edu_hero_stat1_txt: ${JSON.stringify(edu('edu_hero_stat1_txt', 'en'))},
+    edu_hero_stat2_num: ${JSON.stringify(edu('edu_hero_stat2_num', 'en'))},
+    edu_hero_stat2_txt: ${JSON.stringify(edu('edu_hero_stat2_txt', 'en'))},
+    edu_hero_stat3_num: ${JSON.stringify(edu('edu_hero_stat3_num', 'en'))},
+    edu_hero_stat3_txt: ${JSON.stringify(edu('edu_hero_stat3_txt', 'en'))},
+    edu_isg_program: ${JSON.stringify(edu('edu_isg_program', 'en'))},
+    edu_isg_dates: ${JSON.stringify(edu('edu_isg_dates', 'en'))},
+    edu_isg_grade: ${JSON.stringify(edu('edu_isg_grade', 'en'))},
+    edu_isg_desc1: ${JSON.stringify(edu('edu_isg_desc1', 'en'))},
+    edu_isg_desc2: ${JSON.stringify(edu('edu_isg_desc2', 'en'))},
+    edu_isg_opinion: ${JSON.stringify(edu('edu_isg_opinion', 'en'))},
+    edu_isg_modules: ${JSON.stringify(edu('edu_isg_modules', 'en'))},
+    edu_iut_program: ${JSON.stringify(edu('edu_iut_program', 'en'))},
+    edu_iut_dates: ${JSON.stringify(edu('edu_iut_dates', 'en'))},
+    edu_iut_employer: ${JSON.stringify(edu('edu_iut_employer', 'en'))},
+    edu_iut_desc1: ${JSON.stringify(edu('edu_iut_desc1', 'en'))},
+    edu_iut_desc2: ${JSON.stringify(edu('edu_iut_desc2', 'en'))},
+    edu_iut_opinion: ${JSON.stringify(edu('edu_iut_opinion', 'en'))},
+    edu_iut_modules: ${JSON.stringify(edu('edu_iut_modules', 'en'))},
+    edu_gss_desc: ${JSON.stringify(edu('edu_gss_desc', 'en'))},
+
+    /* ── QUALIFICATIONS PAGE ── */
+    qua_hero_pre: ${JSON.stringify(qua('qua_hero_pre', 'en'))},
+    qua_hero_title: ${JSON.stringify(qua('qua_hero_title', 'en'))},
+    qua_hero_sub: ${JSON.stringify(qua('qua_hero_sub', 'en'))},
+    qua_hero_stat1_num: ${JSON.stringify(qua('qua_hero_stat1_num', 'en'))},
+    qua_hero_stat1_txt: ${JSON.stringify(qua('qua_hero_stat1_txt', 'en'))},
+    qua_hero_stat2_num: ${JSON.stringify(qua('qua_hero_stat2_num', 'en'))},
+    qua_hero_stat2_txt: ${JSON.stringify(qua('qua_hero_stat2_txt', 'en'))},
+    qua_hero_stat3_num: ${JSON.stringify(qua('qua_hero_stat3_num', 'en'))},
+    qua_hero_stat3_txt: ${JSON.stringify(qua('qua_hero_stat3_txt', 'en'))},
+    qua_hs_name: ${JSON.stringify(qua('qua_hs_name', 'en'))},
+    qua_hs_skills: ${JSON.stringify(qua('qua_hs_skills', 'en'))},
+    qua_ga_name: ${JSON.stringify(qua('qua_ga_name', 'en'))},
+    qua_ga_skills: ${JSON.stringify(qua('qua_ga_skills', 'en'))},
+    qua_pmi_name: ${JSON.stringify(qua('qua_pmi_name', 'en'))},
+    qua_pmi_status: ${JSON.stringify(qua('qua_pmi_status', 'en'))},
+    qua_pmi_skills: ${JSON.stringify(qua('qua_pmi_skills', 'en'))},
+
+    /* ── CONTACT PAGE ── */
+    cp_hero_pre: ${JSON.stringify(cpLoc('cp_hero_pre', 'en'))},
+    cp_hero_title: ${JSON.stringify(cpLoc('cp_hero_title', 'en'))},
+    cp_email: ${JSON.stringify(cpStr('cp_email'))},
+    cp_linkedin: ${JSON.stringify(cpStr('cp_linkedin'))},
+    cp_linkedin_url: ${JSON.stringify(cpStr('cp_linkedin_url'))},
+    cp_phone: ${JSON.stringify(cpStr('cp_phone'))},
+    cp_phone_url: ${JSON.stringify(cpStr('cp_phone_url'))},
+
+    /* ── BLOG PAGE ── */
+    bl_hero_title: ${JSON.stringify(bl('bl_hero_title', 'en'))},
+    bl_hero_desc: ${JSON.stringify(bl('bl_hero_desc', 'en'))},
   },
 
   fr: {
@@ -230,6 +300,63 @@ const content = {
     /* ── PORTRAIT ── */
     portrait_alt: ${JSON.stringify(loc('portrait_alt', 'fr'))},
     portrait_placeholder: ${JSON.stringify(loc('portrait_placeholder', 'fr'))},
+
+    /* ── EDUCATION PAGE ── */
+    edu_hero_pre: ${JSON.stringify(edu('edu_hero_pre', 'fr'))},
+    edu_hero_title: ${JSON.stringify(edu('edu_hero_title', 'fr'))},
+    edu_hero_sub: ${JSON.stringify(edu('edu_hero_sub', 'fr'))},
+    edu_hero_stat1_num: ${JSON.stringify(edu('edu_hero_stat1_num', 'fr'))},
+    edu_hero_stat1_txt: ${JSON.stringify(edu('edu_hero_stat1_txt', 'fr'))},
+    edu_hero_stat2_num: ${JSON.stringify(edu('edu_hero_stat2_num', 'fr'))},
+    edu_hero_stat2_txt: ${JSON.stringify(edu('edu_hero_stat2_txt', 'fr'))},
+    edu_hero_stat3_num: ${JSON.stringify(edu('edu_hero_stat3_num', 'fr'))},
+    edu_hero_stat3_txt: ${JSON.stringify(edu('edu_hero_stat3_txt', 'fr'))},
+    edu_isg_program: ${JSON.stringify(edu('edu_isg_program', 'fr'))},
+    edu_isg_dates: ${JSON.stringify(edu('edu_isg_dates', 'fr'))},
+    edu_isg_grade: ${JSON.stringify(edu('edu_isg_grade', 'fr'))},
+    edu_isg_desc1: ${JSON.stringify(edu('edu_isg_desc1', 'fr'))},
+    edu_isg_desc2: ${JSON.stringify(edu('edu_isg_desc2', 'fr'))},
+    edu_isg_opinion: ${JSON.stringify(edu('edu_isg_opinion', 'fr'))},
+    edu_isg_modules: ${JSON.stringify(edu('edu_isg_modules', 'fr'))},
+    edu_iut_program: ${JSON.stringify(edu('edu_iut_program', 'fr'))},
+    edu_iut_dates: ${JSON.stringify(edu('edu_iut_dates', 'fr'))},
+    edu_iut_employer: ${JSON.stringify(edu('edu_iut_employer', 'fr'))},
+    edu_iut_desc1: ${JSON.stringify(edu('edu_iut_desc1', 'fr'))},
+    edu_iut_desc2: ${JSON.stringify(edu('edu_iut_desc2', 'fr'))},
+    edu_iut_opinion: ${JSON.stringify(edu('edu_iut_opinion', 'fr'))},
+    edu_iut_modules: ${JSON.stringify(edu('edu_iut_modules', 'fr'))},
+    edu_gss_desc: ${JSON.stringify(edu('edu_gss_desc', 'fr'))},
+
+    /* ── QUALIFICATIONS PAGE ── */
+    qua_hero_pre: ${JSON.stringify(qua('qua_hero_pre', 'fr'))},
+    qua_hero_title: ${JSON.stringify(qua('qua_hero_title', 'fr'))},
+    qua_hero_sub: ${JSON.stringify(qua('qua_hero_sub', 'fr'))},
+    qua_hero_stat1_num: ${JSON.stringify(qua('qua_hero_stat1_num', 'fr'))},
+    qua_hero_stat1_txt: ${JSON.stringify(qua('qua_hero_stat1_txt', 'fr'))},
+    qua_hero_stat2_num: ${JSON.stringify(qua('qua_hero_stat2_num', 'fr'))},
+    qua_hero_stat2_txt: ${JSON.stringify(qua('qua_hero_stat2_txt', 'fr'))},
+    qua_hero_stat3_num: ${JSON.stringify(qua('qua_hero_stat3_num', 'fr'))},
+    qua_hero_stat3_txt: ${JSON.stringify(qua('qua_hero_stat3_txt', 'fr'))},
+    qua_hs_name: ${JSON.stringify(qua('qua_hs_name', 'fr'))},
+    qua_hs_skills: ${JSON.stringify(qua('qua_hs_skills', 'fr'))},
+    qua_ga_name: ${JSON.stringify(qua('qua_ga_name', 'fr'))},
+    qua_ga_skills: ${JSON.stringify(qua('qua_ga_skills', 'fr'))},
+    qua_pmi_name: ${JSON.stringify(qua('qua_pmi_name', 'fr'))},
+    qua_pmi_status: ${JSON.stringify(qua('qua_pmi_status', 'fr'))},
+    qua_pmi_skills: ${JSON.stringify(qua('qua_pmi_skills', 'fr'))},
+
+    /* ── CONTACT PAGE ── */
+    cp_hero_pre: ${JSON.stringify(cpLoc('cp_hero_pre', 'fr'))},
+    cp_hero_title: ${JSON.stringify(cpLoc('cp_hero_title', 'fr'))},
+    cp_email: ${JSON.stringify(cpStr('cp_email'))},
+    cp_linkedin: ${JSON.stringify(cpStr('cp_linkedin'))},
+    cp_linkedin_url: ${JSON.stringify(cpStr('cp_linkedin_url'))},
+    cp_phone: ${JSON.stringify(cpStr('cp_phone'))},
+    cp_phone_url: ${JSON.stringify(cpStr('cp_phone_url'))},
+
+    /* ── BLOG PAGE ── */
+    bl_hero_title: ${JSON.stringify(bl('bl_hero_title', 'fr'))},
+    bl_hero_desc: ${JSON.stringify(bl('bl_hero_desc', 'fr'))},
   },
 };
 
@@ -238,7 +365,7 @@ export default content;
 
   const outPath = join(__dirname, '..', 'content.js');
   writeFileSync(outPath, generated, 'utf8');
-  console.log('[fetch-content] ✅ content.js written from Sanity data');
+  console.log('[fetch-content] ✅ content.js written from Sanity data (homepage + 4 sub-pages)');
 }
 
 main().catch((err) => {
