@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Dispatch — Melvyn Cross</title>
-  <meta name="description" content="Thoughts on e-commerce strategy, AI in retail, and what's actually happening in the market. Written by Melvyn Cross." />
+  <title>My Reads — Melvyn Cross</title>
+  <meta name="description" content="Books I've read on personal finance, mindset, business, and personal development — with my honest thoughts and key takeaways." />
   <meta property="og:type"        content="website" />
-  <meta property="og:title"       content="The Dispatch — Melvyn Cross" />
-  <meta property="og:description" content="Thoughts on e-commerce strategy, AI in retail, and what's actually happening in the market." />
+  <meta property="og:title"       content="My Reads — Melvyn Cross" />
+  <meta property="og:description" content="Books that genuinely changed how I think about money, strategy, and building something of my own." />
   <meta name="twitter:card"       content="summary_large_image" />
 
   <script>(function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -20,7 +20,7 @@
 </head>
 <body class="blog-page">
 
-  <!-- ── PAGE TRANSITION CURTAIN — first child so it paints before any content ── -->
+  <!-- ── PAGE TRANSITION CURTAIN ── -->
   <div id="pt-curtain" style="position:fixed;inset:0;background:#0A1628;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;pointer-events:none;">
     <span style="font-family:'Fraunces','Times New Roman',serif;font-size:clamp(3.5rem,10vw,6rem);font-style:italic;font-weight:400;letter-spacing:-0.03em;color:#F5EDE0;line-height:1;user-select:none;">MC</span>
     <span class="pt-dot" style="width:5px;height:5px;border-radius:50%;background:#F4A547;"></span>
@@ -37,61 +37,53 @@
       <a href="/contact" target="_blank" rel="noopener noreferrer" class="nav__contact-cta">Contact me</a>
       <a href="/qualifications" class="nav__blog-link">My qualifications</a>
       <a href="/education" class="nav__blog-link">My education</a>
-      <a href="/blog" class="nav__blog-link nav__blog-link--active">The Dispatch</a>
-      <a href="/books" class="nav__blog-link">My reads</a>
+      <a href="/blog" class="nav__blog-link">The Dispatch</a>
+      <a href="/books" class="nav__blog-link nav__blog-link--active">My reads</a>
       <button class="nav__theme" id="theme-toggle" aria-label="Toggle dark mode">☽</button>
     </div>
   </nav>
 
-  <!-- ── HERO ── -->
-  <section class="bl-hero">
-    <div class="bl-hero__inner">
+  <!-- ── HERO (navy) ── -->
+  <section class="bk-hero">
+    <div class="bk-hero__glow" aria-hidden="true"></div>
+    <div class="bk-hero__inner">
 
-      <!-- Left: header text -->
-      <div class="bl-hero__header">
-        <div class="bl-eyebrow">
-          <div class="bl-eyebrow__line"></div>
-          <span class="bl-eyebrow__text">The Dispatch</span>
-          <div class="bl-eyebrow__line"></div>
+      <p class="bk-hero__pre">My reading list</p>
+      <h1 class="bk-hero__title">Books I've <em>Read</em>.</h1>
+      <p class="bk-hero__desc">Personal finance, mindset, business — books that genuinely changed how I think about money, strategy, and building something of my own.</p>
+
+      <div class="bk-hero__strip">
+        <div class="bk-hero__stat">
+          <span class="bk-hero__stat-num" id="bk-count">—</span>
+          <span class="bk-hero__stat-label">Books read</span>
         </div>
-        <h1 class="bl-hero__title" data-i18n="bl_hero_title">Stories &amp; <em>Ideas</em>.</h1>
-        <p class="bl-hero__desc" data-i18n="bl_hero_desc">Where I write about e-commerce strategy, what AI is actually changing, and what the market is doing when no one's looking.</p>
-        <a href="#bl-posts" class="bl-hero__scroll">↓ All posts</a>
-      </div>
-
-      <!-- Right: featured post card -->
-      <div class="bl-hero__featured" id="bl-featured">
-        <div class="bl-card bl-card--featured bl-skeleton" id="bl-featured-card">
-          <div class="bl-skeleton__shine"></div>
+        <div class="bk-hero__stat">
+          <span class="bk-hero__stat-num">5</span>
+          <span class="bk-hero__stat-label">Categories</span>
+        </div>
+        <div class="bk-hero__stat">
+          <span class="bk-hero__stat-num">10</span>
+          <span class="bk-hero__stat-label">Max rating</span>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- ── ALL POSTS ── -->
-  <section class="bl-posts" id="bl-posts">
-    <div class="bl-posts__inner">
+  <!-- ── BOOKS GRID ── -->
+  <section class="bk-section" id="bk-section">
+    <div class="bk-section__inner">
 
-      <!-- Loading state -->
-      <div class="bl-grid bl-grid--skeleton" id="bl-skeleton">
-        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
-        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
-        <div class="bl-card bl-skeleton"><div class="bl-skeleton__shine"></div></div>
+      <!-- Skeleton loading state -->
+      <div class="bk-grid" id="bk-skeleton" aria-hidden="true">
+        <div class="bk-card bk-card--skeleton"><div class="bk-skeleton__shine"></div></div>
+        <div class="bk-card bk-card--skeleton"><div class="bk-skeleton__shine"></div></div>
+        <div class="bk-card bk-card--skeleton"><div class="bk-skeleton__shine"></div></div>
+        <div class="bk-card bk-card--skeleton"><div class="bk-skeleton__shine"></div></div>
       </div>
 
-      <!-- Post grid -->
-      <div class="bl-grid" id="bl-grid" hidden></div>
-
-      <!-- Empty -->
-      <div class="bl-empty" id="bl-empty" hidden>
-        <p class="bl-empty__text">Nothing published yet — check back soon.</p>
-      </div>
-
-      <!-- Error -->
-      <div class="bl-empty" id="bl-error" hidden>
-        <p class="bl-empty__text">Could not load posts. Try refreshing.</p>
-      </div>
+      <!-- Populated by books.js -->
+      <div class="bk-grid" id="bk-grid"></div>
 
     </div>
   </section>
@@ -113,7 +105,6 @@
           <a href="https://www.linkedin.com/in/melvyn-botlhe" target="_blank" rel="noopener noreferrer" class="ftr__social" aria-label="LinkedIn">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           </a>
-          <!-- TODO: Replace # with your Instagram URL, e.g. https://www.instagram.com/yourhandle -->
           <a href="https://www.instagram.com/melvyncross" target="_blank" rel="noopener noreferrer" class="ftr__social" aria-label="Instagram">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
           </a>
@@ -154,7 +145,7 @@
     </div>
   </footer>
 
-  <script type="module" src="blog.js"></script>
+  <script type="module" src="books.js"></script>
   <script src="page-transition.js"></script>
   <script src="cookie-consent.js"></script>
   <script src="ftr-subscribe.js"></script>

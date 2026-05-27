@@ -30,6 +30,10 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     },
     {
+      "source": "/books.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+    },
+    {
       "source": "/post.js",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
     },

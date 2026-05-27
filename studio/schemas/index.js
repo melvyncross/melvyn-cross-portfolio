@@ -5,6 +5,7 @@ import { qualificationsContent } from './qualificationsContent.js';
 import { contactPageContent } from './contactPageContent.js';
 import { blogPageContent } from './blogPageContent.js';
 import { post } from './post.js';
+import { book } from './book.js';
 
 export const schemaTypes = [
   localizedString,
@@ -15,4 +16,5 @@ export const schemaTypes = [
   contactPageContent,
   blogPageContent,
   post,
+  book,
 ];

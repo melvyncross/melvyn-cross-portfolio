@@ -73,6 +73,17 @@ export default defineConfig({
                   .filter('_type == "post"')
                   .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
               ),
+            // ── BOOKS ────────────────────────────────────────────────────
+            S.listItem()
+              .title('Reading List')
+              .schemaType('book')
+              .child(
+                S.documentList()
+                  .title('Reading List')
+                  .schemaType('book')
+                  .filter('_type == "book"')
+                  .defaultOrdering([{ field: 'featured', direction: 'desc' }])
+              ),
           ]),
     }),
   ],
