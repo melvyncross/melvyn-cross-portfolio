@@ -2709,6 +2709,28 @@ html { scroll-behavior: smooth; }
 [data-theme="dark"] .edu-badge--iut { background: rgba(245,237,224,0.15); color: var(--cream); border: 1px solid rgba(245,237,224,0.2); }
 .edu-badge--gss { background: transparent; color: var(--paper-mute); border: 1px solid var(--rule); }
 [data-theme="dark"] .edu-badge--gss { color: var(--ink-mute); border-color: rgba(205,204,202,0.2); }
+/* Logo image badge — replaces coloured circle for schools that have real logos */
+.edu-badge--logo {
+  border-radius: 10px;
+  background: #ffffff;
+  object-fit: contain;
+  padding: 4px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+[data-theme="dark"] .edu-badge--logo { background: rgba(255,255,255,0.92); }
+/* CGE trust badge */
+.edu-cge-row {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+.edu-cge-badge {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.8;
+}
+[data-theme="dark"] .edu-cge-badge { filter: brightness(0.92); }
 
 /* ── Card header ── */
 .edu-card__school-row {
@@ -2873,6 +2895,17 @@ html { scroll-behavior: smooth; }
 .edu-diploma__line--med   { width: 45%; }
 .edu-diploma__line--short { width: 30%; }
 .edu-diploma__line--thin  { height: 3px; opacity: 0.15; }
+/* Real diploma photo — blurred */
+.edu-diploma__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: blur(6px);
+  transform: scale(1.04); /* prevent blur edge fringing */
+  user-select: none;
+  pointer-events: none;
+}
 
 .edu-diploma__overlay {
   position: absolute; inset: 0;
