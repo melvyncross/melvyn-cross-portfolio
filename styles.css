@@ -2718,19 +2718,7 @@ html { scroll-behavior: smooth; }
   border: 1px solid rgba(0,0,0,0.08);
 }
 [data-theme="dark"] .edu-badge--logo { background: rgba(255,255,255,0.92); }
-/* CGE trust badge */
-.edu-cge-row {
-  margin-top: 0.75rem;
-  display: flex;
-  align-items: center;
-}
-.edu-cge-badge {
-  height: 26px;
-  width: auto;
-  object-fit: contain;
-  opacity: 0.8;
-}
-[data-theme="dark"] .edu-cge-badge { filter: brightness(0.92); }
+
 
 /* ── Card header ── */
 .edu-card__school-row {
