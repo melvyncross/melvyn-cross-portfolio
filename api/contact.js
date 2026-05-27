@@ -15,8 +15,17 @@ const NOTIFY_EMAIL = 'melvyn.cross05@gmail.com';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Max field lengths to prevent abuse
+const MAX_NAME    = 120;
+const MAX_EMAIL   = 254;  // RFC 5321 max
+const MAX_MESSAGE = 5000;
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function autoReplyHtml(name, message) {
-  const firstName = name.split(' ')[0];
+  const firstName = esc(name.split(' ')[0]);
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -48,7 +57,9 @@ function autoReplyHtml(name, message) {
 }
 
 function notificationHtml(name, email, message) {
-  const safeMsg = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeName  = esc(name);
+  const safeEmail = esc(email);
+  const safeMsg   = esc(message);
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -63,11 +74,11 @@ function notificationHtml(name, email, message) {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="72" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F4C;vertical-align:top;padding:10px 0;border-bottom:1px solid #f0e8e0;">Name</td>
-            <td style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;color:#0A1628;padding:10px 0 10px 20px;border-bottom:1px solid #f0e8e0;">${name}</td>
+            <td style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;color:#0A1628;padding:10px 0 10px 20px;border-bottom:1px solid #f0e8e0;">${safeName}</td>
           </tr>
           <tr>
             <td width="72" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F4C;vertical-align:top;padding:10px 0;border-bottom:1px solid #f0e8e0;">Email</td>
-            <td style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;color:#0A1628;padding:10px 0 10px 20px;border-bottom:1px solid #f0e8e0;"><a href="mailto:${email}" style="color:#0A1628;">${email}</a></td>
+            <td style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:15px;color:#0A1628;padding:10px 0 10px 20px;border-bottom:1px solid #f0e8e0;"><a href="mailto:${safeEmail}" style="color:#0A1628;">${safeEmail}</a></td>
           </tr>
           <tr>
             <td width="72" style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#6B5F4C;vertical-align:top;padding:10px 0;">Message</td>
@@ -76,7 +87,7 @@ function notificationHtml(name, email, message) {
         </table>
       </td></tr>
       <tr><td style="padding-top:24px;">
-        <p style="font-family:'Courier New',monospace;font-size:10px;color:#9E8E7E;margin:0;">Sent via melvyncross.com · <a href="mailto:${email}" style="color:#9E8E7E;">Reply directly</a></p>
+        <p style="font-family:'Courier New',monospace;font-size:10px;color:#9E8E7E;margin:0;">Sent via melvyncross.com · <a href="mailto:${safeEmail}" style="color:#9E8E7E;">Reply directly</a></p>
       </td></tr>
     </table>
   </td></tr>
@@ -107,10 +118,13 @@ export default async function handler(req, res) {
   const { name, email, message } = req.body ?? {};
 
   // Validation
-  if (!name?.trim())                return res.status(400).json({ error: 'Name is required.' });
-  if (!email?.trim())               return res.status(400).json({ error: 'Email is required.' });
-  if (!EMAIL_RE.test(email.trim())) return res.status(400).json({ error: 'Please enter a valid email address.' });
-  if (!message?.trim())             return res.status(400).json({ error: 'Message is required.' });
+  if (!name?.trim())                           return res.status(400).json({ error: 'Name is required.' });
+  if (name.trim().length > MAX_NAME)           return res.status(400).json({ error: 'Name is too long.' });
+  if (!email?.trim())                          return res.status(400).json({ error: 'Email is required.' });
+  if (email.trim().length > MAX_EMAIL)         return res.status(400).json({ error: 'Email address is too long.' });
+  if (!EMAIL_RE.test(email.trim()))            return res.status(400).json({ error: 'Please enter a valid email address.' });
+  if (!message?.trim())                        return res.status(400).json({ error: 'Message is required.' });
+  if (message.trim().length > MAX_MESSAGE)     return res.status(400).json({ error: 'Message is too long (max 5000 characters).' });
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -128,13 +142,13 @@ export default async function handler(req, res) {
       sendEmail(apiKey, {
         from:    FROM_SENDER,
         to:      e,
-        subject: `Got your message, ${n.split(' ')[0]}`,
+        subject: `Got your message, ${n.replace(/[<>"]/g, '').split(' ')[0]}`,
         html:    autoReplyHtml(n, m),
       }),
       sendEmail(apiKey, {
         from:    FROM_SYSTEM,
         to:      NOTIFY_EMAIL,
-        subject: `New lead: ${n}`,
+        subject: `New lead: ${n.replace(/[<>"]/g, '')}`,
         html:    notificationHtml(n, e, m),
       }),
     ]);

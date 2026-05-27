@@ -34,6 +34,7 @@ export default defineConfig({
                 S.documentList()
                   .title('Blog Posts')
                   .schemaType('post')
+                  .filter('_type == "post"')
                   .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
               ),
           ]),
