@@ -16,9 +16,31 @@ const FROM_SENDER   = 'Melvyn Cross <onboarding@resend.dev>';
 const FROM_SYSTEM   = 'Portfolio <onboarding@resend.dev>';
 const NOTIFY_EMAIL  = 'melvyn.cross05@gmail.com';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL = 254; // RFC 5321 max
 
-function welcomeHtml(email) {
+// Full HTML entity escaping — consistent with contact.js
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Origin allowlist — only accept requests from the live site and local dev ──
+const ALLOWED_ORIGINS = new Set([
+  'https://melvyncross.com',
+  'https://www.melvyncross.com',
+]);
+function isOriginAllowed(req) {
+  const origin = (req.headers.origin || '').trim();
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  if (/^https:\/\/[\w-]+-melvyn-cross-projects\.vercel\.app$/.test(origin)) return true;
+  if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
+  if (/^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) return true;
+  return false;
+}
+
+function welcomeHtml(emailRaw) {
+  const email = esc(emailRaw);
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -53,7 +75,7 @@ function welcomeHtml(email) {
 }
 
 function notifyHtml(email) {
-  const safeEmail = email.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeEmail = esc(email);
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -91,14 +113,35 @@ async function sendEmail(apiKey, payload) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(204).end();
+  }
+
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST, OPTIONS');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email } = req.body ?? {};
+  // Origin guard — reject requests not from the live site or local dev
+  if (!isOriginAllowed(req)) {
+    return res.status(403).json({ error: 'Forbidden.' });
+  }
 
-  if (!email?.trim())                return res.status(400).json({ error: 'Please enter your email address.' });
-  if (!EMAIL_RE.test(email.trim())) return res.status(400).json({ error: 'Please enter a valid email address.' });
+  const { email, website } = req.body ?? {};
+
+  // Honeypot — bots fill this hidden field; humans never see it
+  if (website && website.trim() !== '') {
+    return res.status(400).json({ error: 'Bad request.' });
+  }
+
+  if (!email?.trim())                          return res.status(400).json({ error: 'Please enter your email address.' });
+  if (email.trim().length > MAX_EMAIL)         return res.status(400).json({ error: 'Email address is too long.' });
+  if (!EMAIL_RE.test(email.trim()))            return res.status(400).json({ error: 'Please enter a valid email address.' });
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {

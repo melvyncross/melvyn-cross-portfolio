@@ -15,6 +15,21 @@ const NOTIFY_EMAIL = 'melvyn.cross05@gmail.com';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// ── Origin allowlist — only accept requests from the live site and local dev ──
+const ALLOWED_ORIGINS = new Set([
+  'https://melvyncross.com',
+  'https://www.melvyncross.com',
+]);
+function isOriginAllowed(req) {
+  const origin = (req.headers.origin || '').trim();
+  if (!origin) return false;                                         // no origin = non-browser (curl, scripts)
+  if (ALLOWED_ORIGINS.has(origin)) return true;                     // production
+  if (/^https:\/\/[\w-]+-melvyn-cross-projects\.vercel\.app$/.test(origin)) return true; // preview deploys
+  if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;   // local dev
+  if (/^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) return true;
+  return false;
+}
+
 // Max field lengths to prevent abuse
 const MAX_NAME    = 120;
 const MAX_EMAIL   = 254;  // RFC 5321 max
@@ -110,12 +125,33 @@ async function sendEmail(apiKey, payload) {
 }
 
 export default async function handler(req, res) {
+  // Set explicit Content-Type on all responses
+  res.setHeader('Content-Type', 'application/json');
+
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(204).end();
+  }
+
   // Only accept POST
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST, OPTIONS');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, email, message } = req.body ?? {};
+  // Origin guard — reject requests not from the live site or local dev
+  if (!isOriginAllowed(req)) {
+    return res.status(403).json({ error: 'Forbidden.' });
+  }
+
+  const { name, email, message, website } = req.body ?? {};
+
+  // Honeypot — bots fill this hidden field; humans never see it
+  if (website && website.trim() !== '') {
+    return res.status(400).json({ error: 'Bad request.' });
+  }
 
   // Validation
   if (!name?.trim())                           return res.status(400).json({ error: 'Name is required.' });
@@ -142,13 +178,13 @@ export default async function handler(req, res) {
       sendEmail(apiKey, {
         from:    FROM_SENDER,
         to:      e,
-        subject: `Got your message, ${n.replace(/[<>"]/g, '').split(' ')[0]}`,
+        subject: `Got your message, ${n.replace(/[\r\n<>"]/g, '').split(' ')[0]}`,
         html:    autoReplyHtml(n, m),
       }),
       sendEmail(apiKey, {
         from:    FROM_SYSTEM,
         to:      NOTIFY_EMAIL,
-        subject: `New lead: ${n.replace(/[<>"]/g, '')}`,
+        subject: `New lead: ${n.replace(/[\r\n<>"]/g, '')}`,
         html:    notificationHtml(n, e, m),
       }),
     ]);

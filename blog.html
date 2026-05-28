@@ -138,6 +138,8 @@
         <p class="ftr__nav-label">The Dispatch</p>
         <p class="ftr__newsletter-desc">New articles, case studies, and e-commerce thinking — straight to your inbox. No noise, no fluff.</p>
         <form class="ftr__form" id="ftr-subscribe-form" novalidate>
+          <!-- Honeypot — hidden from humans, bots fill it automatically -->
+          <div style="position:absolute;left:-9999px;height:0;width:0;overflow:hidden;" aria-hidden="true"><input type="text" id="ftr-website" name="website" tabindex="-1" autocomplete="off" value="" /></div>
           <input type="email" class="ftr__input" id="ftr-email" placeholder="your@email.com" autocomplete="email" required aria-label="Email address" />
           <button type="submit" class="ftr__btn">Subscribe →</button>
         </form>

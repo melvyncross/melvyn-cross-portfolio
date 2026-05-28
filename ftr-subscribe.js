@@ -45,7 +45,7 @@
     fetch('/api/subscribe', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email: email }),
+      body:    JSON.stringify({ email: email, website: (document.getElementById('ftr-website') || {}).value || '' }),
     })
     .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, data: d }; }); })
     .then(function (r) {

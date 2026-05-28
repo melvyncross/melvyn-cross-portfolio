@@ -438,7 +438,11 @@ async function main() {
   _rebindCursorHover = initCursor();
   const slugVal=new URLSearchParams(window.location.search).get('slug');
 
-  if(!slugVal){
+  // Sanitize slugVal before embedding in GROQ query — prevents GROQ injection
+  // Valid Sanity slugs are URL-safe: letters, digits, hyphens, underscores
+  const SLUG_RE = /^[a-zA-Z0-9_-]{1,200}$/;
+
+  if(!slugVal || (!SLUG_RE.test(slugVal) && slugVal !== '__demo__')){
     document.getElementById('pt-loading').hidden=true;
     document.getElementById('pt-notfound').hidden=false;
     return;
