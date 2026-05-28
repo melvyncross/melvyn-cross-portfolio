@@ -4018,3 +4018,185 @@ html { scroll-behavior: smooth; }
   .bk-hero__inner { opacity: 1 !important; transform: none !important; animation: none !important; }
   .bk-skeleton__shine { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   IN THE FIELD — Experiences Gallery Page
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Hero ── */
+.exp-hero {
+  position: relative;
+  padding: clamp(7rem, 14vw, 11rem) var(--gap) clamp(4rem, 8vw, 6rem);
+  overflow: hidden;
+}
+.exp-hero__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 70% 40%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%);
+  pointer-events: none;
+}
+.exp-hero__inner {
+  max-width: var(--content-w);
+  margin: 0 auto;
+}
+.exp-hero__pre {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+.exp-hero__title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 400;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.exp-hero__title em {
+  font-style: italic;
+  color: var(--accent);
+}
+.exp-hero__sub {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  color: var(--ink-muted);
+  max-width: 52ch;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+.exp-hero__strip {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.exp-hero__count strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.exp-hero__count span {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--mono);
+}
+
+/* ── Gallery grid ── */
+.exp-gallery {
+  padding: clamp(3rem, 6vw, 5rem) var(--gap) clamp(5rem, 10vw, 8rem);
+  background: var(--surface);
+}
+.exp-gallery__inner {
+  max-width: var(--content-w);
+  margin: 0 auto;
+}
+.exp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 1.75rem;
+}
+
+/* ── Gallery card ── */
+.exp-card {
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-bg, var(--paper));
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94),
+              box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.exp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -10px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+/* Image wrapper */
+.exp-card__img-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--border);
+}
+.exp-card__img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+  display: block;
+}
+.exp-card:hover .exp-card__img-wrap img {
+  transform: scale(1.04);
+}
+
+/* Tag badge */
+.exp-card__tag {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--paper);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+}
+
+/* Text body */
+.exp-card__body {
+  padding: 1.4rem 1.5rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+.exp-card__title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.exp-card__desc {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.65;
+}
+.exp-card__meta {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Wide card (spans 2 cols on large screens) ── */
+@media (min-width: 780px) {
+  .exp-card--wide {
+    grid-column: span 2;
+  }
+  .exp-card--wide .exp-card__img-wrap {
+    aspect-ratio: 16 / 7;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .exp-card { transition: none !important; }
+  .exp-card__img-wrap img { transition: none !important; }
+}
