@@ -13,6 +13,512 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ══════════════════════════════════════════════════════════════
+       IN THE FIELD v2 — Carousel + Lightbox + Tilt + Reveal
+       Overrides the shared styles.css exp-* section
+       ══════════════════════════════════════════════════════════════ */
+
+    /* ── Hero ── */
+    .exp-hero {
+      position: relative;
+      min-height: 78vh;
+      display: flex;
+      align-items: center;
+      padding: clamp(9rem, 17vw, 14rem) var(--gap) clamp(6rem, 11vw, 9rem);
+      overflow: hidden;
+      background: #080d16;
+    }
+    .exp-hero__glow {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 55%, rgba(244,165,71,.11), transparent 65%),
+        radial-gradient(ellipse 55% 65% at 88% 15%, rgba(90,140,255,.07), transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 100%, rgba(244,165,71,.04), transparent 70%);
+      pointer-events: none;
+    }
+    .exp-hero__noise {
+      position: absolute;
+      inset: 0;
+      opacity: .04;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+    .exp-hero__inner {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content-w);
+      margin: 0 auto;
+      width: 100%;
+    }
+    .exp-hero__pre {
+      display: inline-flex;
+      align-items: center;
+      gap: .75rem;
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: rgba(244,165,71,.8);
+      margin-bottom: 1.75rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .exp-hero__pre::before {
+      content: '';
+      width: 2rem;
+      height: 1px;
+      background: rgba(244,165,71,.4);
+      flex-shrink: 0;
+    }
+    .exp-hero__pre.is-vis { opacity: 1; transform: none; }
+
+    .exp-hero__title {
+      font-family: var(--serif);
+      font-size: clamp(3.6rem, 9.5vw, 8.2rem);
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -.04em;
+      color: #F5EDE0;
+      margin-bottom: 2rem;
+    }
+    .exp-hero__title em {
+      font-style: italic;
+      color: #F4A547;
+    }
+    /* Word mask reveal */
+    .hw { display: inline-block; overflow: hidden; vertical-align: bottom; }
+    .hwi {
+      display: inline-block;
+      transform: translateY(112%);
+      transition: transform .75s cubic-bezier(.16,1,.3,1);
+    }
+    .hwi.is-vis { transform: translateY(0); }
+
+    .exp-hero__sub {
+      font-size: clamp(.95rem, 1.55vw, 1.18rem);
+      color: rgba(245,237,224,.5);
+      max-width: 48ch;
+      line-height: 1.72;
+      margin-bottom: 3rem;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .7s ease .55s, transform .7s ease .55s;
+    }
+    .exp-hero__sub.is-vis { opacity: 1; transform: none; }
+
+    .exp-hero__strip {
+      display: flex;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .7s ease .75s, transform .7s ease .75s;
+    }
+    .exp-hero__strip.is-vis { opacity: 1; transform: none; }
+    .exp-hero__count { display: flex; flex-direction: column; gap: .28rem; }
+    .exp-hero__count strong {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 3.8vw, 3.2rem);
+      font-weight: 300;
+      color: #F5EDE0;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .exp-hero__count span {
+      font-family: var(--mono);
+      font-size: .66rem;
+      color: rgba(245,237,224,.38);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .exp-hero__scroll {
+      position: absolute;
+      bottom: 2.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      opacity: 0;
+      animation: shFade 1s ease 1.4s forwards;
+    }
+    .exp-hero__scroll span {
+      font-family: var(--mono);
+      font-size: .58rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: rgba(245,237,224,.25);
+    }
+    .exp-hero__scroll-bar {
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(to bottom, rgba(244,165,71,.5), transparent);
+      transform-origin: top;
+      animation: shBar 1.8s ease-in-out infinite 1.8s;
+    }
+    @keyframes shFade { to { opacity: 1; } }
+    @keyframes shBar { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(.35)} }
+
+    /* ── Chapters ── */
+    .exp-chapters {
+      background: var(--surface);
+      padding-bottom: clamp(6rem, 12vw, 10rem);
+    }
+    .exp-chapter {
+      padding: clamp(4rem, 7vw, 6rem) 0;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(44px);
+      transition: opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1);
+    }
+    .exp-chapter.is-vis { opacity: 1; transform: none; }
+
+    .exp-chapter__hd {
+      display: flex;
+      align-items: baseline;
+      gap: 1.25rem;
+      padding: 0 var(--gap);
+      max-width: calc(var(--content-w) + 2 * var(--gap));
+      margin: 0 auto clamp(1.75rem,3.5vw,2.75rem);
+      flex-wrap: wrap;
+    }
+    .exp-chapter__num {
+      font-family: var(--mono);
+      font-size: .67rem;
+      letter-spacing: .14em;
+      color: var(--accent);
+      opacity: .65;
+      flex-shrink: 0;
+    }
+    .exp-chapter__name {
+      font-family: var(--serif);
+      font-size: clamp(1.85rem,3.8vw,3rem);
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -.022em;
+      line-height: 1;
+      flex: 1;
+    }
+    .exp-chapter__name em { font-style: italic; color: var(--accent); }
+    .exp-chapter__hint {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      opacity: .45;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Carousel ── */
+    .exp-carousel {
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .exp-carousel.is-drag { cursor: grabbing; }
+    .exp-carousel__track {
+      display: flex;
+      gap: 1.5rem;
+      padding: .5rem max(var(--gap), calc((100vw - var(--content-w)) / 2)) 2.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: pan-y;
+    }
+    .exp-carousel__track::-webkit-scrollbar { display: none; }
+    /* Edge fades */
+    .exp-carousel::before,
+    .exp-carousel::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 2.5rem;
+      width: clamp(2rem,5vw,4rem);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .exp-carousel::before { left:0; background:linear-gradient(to right,var(--surface),transparent); }
+    .exp-carousel::after  { right:0; background:linear-gradient(to left,var(--surface),transparent); }
+
+    /* ── Card ── */
+    .exp-card {
+      flex: 0 0 auto;
+      width: clamp(270px,36vw,420px);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      box-shadow: 0 4px 28px -8px rgba(0,0,0,.13);
+      /* 3D tilt applied by JS — keep transitions loose so JS resets feel smooth */
+      will-change: transform;
+      transition: box-shadow .4s ease;
+    }
+    .exp-card:hover { box-shadow: 0 22px 64px -14px rgba(0,0,0,.24); }
+
+    .exp-card__img-wrap {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      position: relative;
+      background: var(--border);
+    }
+    .exp-card__img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      pointer-events: none;
+      transition: transform .65s cubic-bezier(.25,.46,.45,.94);
+    }
+    .exp-card:hover .exp-card__img-wrap img { transform: scale(1.06); }
+
+    /* Caption overlay */
+    .exp-card__cap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.4rem;
+      background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.42) 45%, transparent 72%);
+      opacity: 0;
+      transition: opacity .32s ease;
+    }
+    .exp-card:hover .exp-card__cap { opacity: 1; }
+
+    .exp-card__tag {
+      position: absolute;
+      top: 1rem; left: 1rem;
+      background: rgba(0,0,0,.52);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: rgba(255,255,255,.88);
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .28em .72em;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .exp-card__cap-title {
+      font-family: var(--serif);
+      font-size: clamp(.9rem,1.4vw,1.1rem);
+      font-weight: 400;
+      color: #F5EDE0;
+      line-height: 1.3;
+      margin-bottom: .3rem;
+      letter-spacing: -.01em;
+      transform: translateY(7px);
+      transition: transform .32s cubic-bezier(.16,1,.3,1);
+    }
+    .exp-card:hover .exp-card__cap-title { transform: none; }
+    .exp-card__cap-desc {
+      font-size: .78rem;
+      color: rgba(245,237,224,.58);
+      line-height: 1.55;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .4s ease, opacity .4s ease;
+    }
+    .exp-card:hover .exp-card__cap-desc { max-height: 72px; opacity: 1; }
+    .exp-card__cap-meta {
+      margin-top: .45rem;
+      font-family: var(--mono);
+      font-size: .59rem;
+      color: rgba(244,165,71,.82);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transform: translateY(7px);
+      transition: transform .32s cubic-bezier(.16,1,.3,1) .04s;
+    }
+    .exp-card:hover .exp-card__cap-meta { transform: none; }
+
+    /* ── Lightbox ── */
+    .exp-lb {
+      position: fixed; inset: 0;
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .32s ease;
+    }
+    .exp-lb.is-open { opacity: 1; pointer-events: all; }
+
+    .exp-lb__bg {
+      position: absolute; inset: 0;
+      background: rgba(4,7,12,.96);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .exp-lb__dialog {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center;
+      width: 90vw;
+      max-height: 92vh;
+    }
+
+    .exp-lb__iw {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      max-height: 72vh;
+      width: 100%;
+      cursor: zoom-in;
+      border-radius: 10px;
+    }
+    .exp-lb__iw.zoomed { cursor: zoom-out; }
+
+    .exp-lb__img {
+      max-width: 100%; max-height: 72vh;
+      object-fit: contain;
+      border-radius: 10px;
+      user-select: none; -webkit-user-select: none;
+      display: block;
+      opacity: 0;
+      transform: scale(.95);
+      transition: opacity .45s ease, transform .5s cubic-bezier(.16,1,.3,1);
+      transform-origin: center center;
+    }
+    .exp-lb.is-open .exp-lb__img { opacity: 1; transform: scale(1); }
+    .exp-lb__iw.zoomed .exp-lb__img { transform: scale(2.2); }
+
+    .exp-lb__zoom-pill {
+      position: absolute;
+      bottom: .85rem; right: .85rem;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px;
+      padding: .28em .65em;
+      font-family: var(--mono);
+      font-size: .58rem;
+      color: rgba(255,255,255,.45);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      animation: pillFade 2.2s ease 0.8s forwards;
+    }
+    @keyframes pillFade { 0%{opacity:0} 15%{opacity:1} 75%{opacity:1} 100%{opacity:0} }
+
+    .exp-lb__foot {
+      padding: 1.2rem 0 0;
+      text-align: center;
+      display: flex; flex-direction: column;
+      align-items: center; gap: .45rem;
+      width: 100%;
+    }
+    .exp-lb__ctr {
+      font-family: var(--mono);
+      font-size: .62rem;
+      letter-spacing: .14em;
+      color: rgba(244,165,71,.65);
+      text-transform: uppercase;
+    }
+    .exp-lb__ttl {
+      font-family: var(--serif);
+      font-size: clamp(1rem,2vw,1.35rem);
+      font-weight: 400;
+      color: #F5EDE0;
+      line-height: 1.3;
+      max-width: 50ch;
+    }
+    .exp-lb__meta {
+      font-family: var(--mono);
+      font-size: .62rem;
+      color: rgba(245,237,224,.38);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* Buttons */
+    .exp-lb__x {
+      position: fixed;
+      top: 1.25rem; right: 1.25rem;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.78);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; line-height: 1;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2;
+      transition: background .2s, transform .2s;
+    }
+    .exp-lb__x:hover { background: rgba(255,255,255,.18); transform: scale(1.1); }
+
+    .exp-lb__nav {
+      position: fixed;
+      top: 50%; transform: translateY(-50%);
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.78);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 2;
+      font-size: 1.1rem;
+      transition: background .2s, transform .2s;
+    }
+    .exp-lb__nav:hover { background: rgba(255,255,255,.2); }
+    .exp-lb__prv { left: 1.25rem; }
+    .exp-lb__prv:hover { transform: translateY(-50%) translateX(-3px); }
+    .exp-lb__nxt { right: 1.25rem; }
+    .exp-lb__nxt:hover { transform: translateY(-50%) translateX(3px); }
+    .exp-lb__nav:disabled { opacity: .18; cursor: default; pointer-events: none; }
+
+    /* ── Cursor gallery mode ── */
+    .cursor--gallery .cursor-ring {
+      width: 58px !important;
+      height: 58px !important;
+      border-color: rgba(244,165,71,.55) !important;
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .exp-hero__pre,.exp-hero__sub,.exp-hero__strip { transition:none!important; opacity:1!important; transform:none!important; }
+      .hwi { transition:none!important; transform:none!important; }
+      .exp-chapter { transition:none!important; opacity:1!important; transform:none!important; }
+      .exp-card { transition:box-shadow .2s!important; }
+      .exp-card__img-wrap img { transition:none!important; }
+      .exp-lb__img { transition:none!important; }
+      .exp-hero__scroll { animation:none!important; opacity:.5!important; }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width:640px) {
+      .exp-lb__nav { display:none; }
+      .exp-chapter__hint { display:none; }
+      .exp-card__cap-desc { display:none; }
+      .exp-carousel::before,.exp-carousel::after { width:1.5rem; }
+    }
+  </style>
 </head>
 <body class="exp-page">
 
@@ -41,271 +547,296 @@
   </nav>
 
   <!-- ── HERO ── -->
-  <section class="exp-hero">
+  <section class="exp-hero" aria-label="Page hero">
     <div class="exp-hero__glow" aria-hidden="true"></div>
+    <div class="exp-hero__noise" aria-hidden="true"></div>
     <div class="exp-hero__inner">
-      <p class="exp-hero__pre">Professional experiences</p>
-      <h1 class="exp-hero__title">In the <em>Field</em>.</h1>
-      <p class="exp-hero__sub">Six years of building, shipping, and showing up — from product shoots in the studio to solar energy trade shows in Munich. A visual record of the work behind the numbers.</p>
-      <div class="exp-hero__strip">
+      <p class="exp-hero__pre" id="eh-pre">Professional experiences</p>
+      <h1 class="exp-hero__title" id="eh-title" aria-label="In the Field.">
+        <span class="hw"><span class="hwi" id="hw0">In</span></span>&nbsp;<span class="hw"><span class="hwi" id="hw1">the</span></span>&nbsp;<span class="hw"><span class="hwi" id="hw2"><em>Field.</em></span></span>
+      </h1>
+      <p class="exp-hero__sub" id="eh-sub">Six years of building, shipping, and showing up — from product shoots in the studio to solar energy trade shows in Munich. A visual record of the work behind the numbers.</p>
+      <div class="exp-hero__strip" id="eh-strip">
         <div class="exp-hero__count">
-          <strong>6</strong>
+          <strong id="cnt-0" data-val="6" data-suf="">6</strong>
           <span>Years at Planet Soar</span>
         </div>
         <div class="exp-hero__count">
-          <strong>3+</strong>
+          <strong id="cnt-1" data-val="3" data-suf="+">3+</strong>
           <span>Countries</span>
         </div>
         <div class="exp-hero__count">
-          <strong>€1.6M</strong>
+          <strong id="cnt-2" data-val="1.6" data-pre="€" data-suf="M">€1.6M</strong>
           <span>Annual revenue built</span>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- ── GALLERY ── -->
-  <section class="exp-gallery">
-    <div class="exp-gallery__inner">
-      <div class="exp-grid">
-
-        <!-- Inter Solar Munich 2023 — wide feature card -->
-        <article class="exp-card exp-card--wide">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Trade Show · 2023</span>
-            <img
-              src="/img/experiences/inter-solar-munich-2023-event.png"
-              alt="Participating at Inter Solar Munich 2023"
-              loading="lazy"
-              width="1200"
-              height="525"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Inter Solar Munich 2023 — Europe's Largest Solar Energy Event</h2>
-            <p class="exp-card__desc">Represented Planet Soar at Inter Solar Europe in Munich — the world's leading exhibition for the solar industry. Spent three days meeting suppliers, scouting emerging product categories, and benchmarking our range against the European market. A pivotal trip for the sourcing strategy we rolled out across Q3–Q4 2023.</p>
-            <span class="exp-card__meta">Munich, Germany · June 2023</span>
-          </div>
-        </article>
-
-        <!-- Inter Solar Munich — arrival -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Trade Show · 2023</span>
-            <img
-              src="/img/experiences/inter-solar-munich-2023-arrival.png"
-              alt="Arriving at Inter Solar Munich 2023"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Arriving at Inter Solar Munich 2023</h2>
-            <p class="exp-card__desc">First day at the Messe München exhibition centre. With over 2,500 exhibitors from across the solar value chain, this was the single biggest sourcing trip I'd undertaken — and one of the most valuable weeks of my professional life.</p>
-            <span class="exp-card__meta">Munich, Germany · June 2023</span>
-          </div>
-        </article>
-
-        <!-- Open Energie Lyon -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Partnership · France</span>
-            <img
-              src="/img/experiences/open-energie-lyon.png"
-              alt="Meeting partners at Open Énergie Lyon"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Meeting Partners at Open Énergie Lyon</h2>
-            <p class="exp-card__desc">Building the distribution network means showing up in person. This meeting with energy sector partners in Lyon was part of a broader push to expand Planet Soar's B2B relationships across the French renewable energy market.</p>
-            <span class="exp-card__meta">Lyon, France</span>
-          </div>
-        </article>
-
-        <!-- Solar power founders -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Leadership · Networking</span>
-            <img
-              src="/img/experiences/solar-power-founders.png"
-              alt="With founders of a solar power company and Planet Soar CEOs"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">With Founders of a Solar Power Company &amp; Planet Soar CEOs</h2>
-            <p class="exp-card__desc">Strategic partnership meetings between Planet Soar's leadership and the founders of a solar power company. These conversations shaped the supply chain decisions and product positioning that drove our revenue growth.</p>
-            <span class="exp-card__meta">Planet Soar · Leadership</span>
-          </div>
-        </article>
-
-        <!-- Gaborone factory -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">International · Botswana</span>
-            <img
-              src="/img/experiences/gaborone-factory.png"
-              alt="Visiting partners' factory in Gaborone, Botswana"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Visiting Partners' Factory — Gaborone, Botswana</h2>
-            <p class="exp-card__desc">An on-the-ground visit to a partner's manufacturing facility in Gaborone. Understanding production realities firsthand — capacity, quality controls, logistics — gave me insights that no spec sheet could replicate, and directly informed our sourcing decisions.</p>
-            <span class="exp-card__meta">Gaborone, Botswana</span>
-          </div>
-        </article>
-
-        <!-- Planet Soar event -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Planet Soar · Event</span>
-            <img
-              src="/img/experiences/planet-soar-event.png"
-              alt="Planet Soar professional event"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Planet Soar — Professional Event</h2>
-            <p class="exp-card__desc">One of many professional moments captured during my time at Planet Soar — where every event, every meeting, and every product launch was another step in building something from the ground up.</p>
-            <span class="exp-card__meta">Planet Soar</span>
-          </div>
-        </article>
-
-        <!-- Team photo — wide -->
-        <article class="exp-card exp-card--wide">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Team · Planet Soar</span>
-            <img
-              src="/img/experiences/team-photo.png"
-              alt="The Planet Soar team"
-              loading="lazy"
-              width="1200"
-              height="525"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">The Planet Soar Team</h2>
-            <p class="exp-card__desc">The people behind the numbers. Building €1.6M in annual revenue is a team effort — this is the group that showed up every day, solved the hard problems, and made the business run. Six years of shared work, shared wins, and shared lessons.</p>
-            <span class="exp-card__meta">Planet Soar · Team</span>
-          </div>
-        </article>
-
-        <!-- Team photo 2 -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Team · Planet Soar</span>
-            <img
-              src="/img/experiences/team-photo-2.png"
-              alt="Planet Soar team moment"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Planet Soar — Team Moment</h2>
-            <p class="exp-card__desc">Another moment with the Planet Soar team. The culture we built — hands-on, commercial, driven — is what I'll carry into every next role.</p>
-            <span class="exp-card__meta">Planet Soar · Team</span>
-          </div>
-        </article>
-
-        <!-- Distributed product presentation -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Product · Distribution</span>
-            <img
-              src="/img/experiences/distributed-product-presentation.png"
-              alt="Distributed product presentation"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Distributed Product Presentation</h2>
-            <p class="exp-card__desc">Presenting Planet Soar's product range to distribution partners. Getting our catalogue in front of the right buyers required a clear pitch, strong product knowledge, and the ability to communicate value quickly — all skills I developed across dozens of these sessions.</p>
-            <span class="exp-card__meta">Planet Soar · Distribution</span>
-          </div>
-        </article>
-
-        <!-- Fixation products photoshoot -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Product · Photo Shoot</span>
-            <img
-              src="/img/experiences/fixation-products-photoshoot.png"
-              alt="Fixation products photo shoot"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Fixation Products Photo Shoot</h2>
-            <p class="exp-card__desc">Hands-on with the fixation products range — one of many in-house photo shoots I organised and directed to keep our product imagery fresh, consistent, and conversion-optimised across the shop.</p>
-            <span class="exp-card__meta">Planet Soar · Product</span>
-          </div>
-        </article>
-
-        <!-- Product photoshoot -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Product · Photo Shoot</span>
-            <img
-              src="/img/experiences/product-photoshoot.png"
-              alt="Product photoshoot"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Product Photoshoot</h2>
-            <p class="exp-card__desc">Photography was a constant part of the job — every new product needed clean, accurate imagery before going live. Managing the brief, the setup, and the post-processing meant our product pages always looked the part.</p>
-            <span class="exp-card__meta">Planet Soar · Product</span>
-          </div>
-        </article>
-
-        <!-- Product photo shooting -->
-        <article class="exp-card">
-          <div class="exp-card__img-wrap">
-            <span class="exp-card__tag">Product · Photo Shoot</span>
-            <img
-              src="/img/experiences/product-photo-shooting.png"
-              alt="Product photo shoot session"
-              loading="lazy"
-              width="800"
-              height="600"
-            />
-          </div>
-          <div class="exp-card__body">
-            <h2 class="exp-card__title">Product Photo Shoot Session</h2>
-            <p class="exp-card__desc">Another shoot session from the catalogue production workflow. With hundreds of SKUs across the range, keeping imagery up to standard was an ongoing operation — one that directly shaped click-through rates and conversion on the shop.</p>
-            <span class="exp-card__meta">Planet Soar · Product</span>
-          </div>
-        </article>
-
-      </div>
+    <div class="exp-hero__scroll" aria-hidden="true">
+      <span>scroll</span>
+      <div class="exp-hero__scroll-bar"></div>
     </div>
   </section>
+
+  <!-- ── CHAPTERS ── -->
+  <div class="exp-chapters">
+
+    <!-- ── 01 Trade Shows ── -->
+    <section class="exp-chapter" data-cat="0">
+      <div class="exp-chapter__hd">
+        <span class="exp-chapter__num">01</span>
+        <h2 class="exp-chapter__name">Trade <em>Shows</em></h2>
+        <span class="exp-chapter__hint" aria-hidden="true">
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true">
+            <path d="M0 4H13M13 4L10 1.5M13 4L10 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Drag to explore
+        </span>
+      </div>
+      <div class="exp-carousel">
+        <div class="exp-carousel__track">
+
+          <article class="exp-card" data-ci="0" data-cat="0" tabindex="0" role="button" aria-label="Open Inter Solar Munich 2023 — Europe's Largest Solar Event">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/inter-solar-munich-2023-event.png" alt="Participating at Inter Solar Munich 2023" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Trade Show · 2023</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Inter Solar Munich 2023 — Europe's Largest Solar Event</p>
+              <p class="exp-card__cap-desc">Represented Planet Soar at Inter Solar Europe — the world's leading solar exhibition. Three days meeting suppliers, scouting categories, and benchmarking our European market position.</p>
+              <span class="exp-card__cap-meta">Munich, Germany · June 2023</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="1" data-cat="0" tabindex="0" role="button" aria-label="Open Arriving at Inter Solar Munich 2023">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/inter-solar-munich-2023-arrival.png" alt="Arriving at Inter Solar Munich 2023" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Trade Show · 2023</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Arriving at Inter Solar Munich 2023</p>
+              <p class="exp-card__cap-desc">First day at the Messe München exhibition centre. With over 2,500 exhibitors across the solar value chain — the single biggest sourcing trip I'd undertaken.</p>
+              <span class="exp-card__cap-meta">Munich, Germany · June 2023</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 02 Partnerships & Visits ── -->
+    <section class="exp-chapter" data-cat="1">
+      <div class="exp-chapter__hd">
+        <span class="exp-chapter__num">02</span>
+        <h2 class="exp-chapter__name">Partnerships &amp; <em>Visits</em></h2>
+        <span class="exp-chapter__hint" aria-hidden="true">
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true">
+            <path d="M0 4H13M13 4L10 1.5M13 4L10 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Drag to explore
+        </span>
+      </div>
+      <div class="exp-carousel">
+        <div class="exp-carousel__track">
+
+          <article class="exp-card" data-ci="0" data-cat="1" tabindex="0" role="button" aria-label="Open Meeting Partners at Open Énergie Lyon">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/open-energie-lyon.png" alt="Meeting partners at Open Énergie Lyon" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Partnership · France</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Meeting Partners at Open Énergie Lyon</p>
+              <p class="exp-card__cap-desc">Building the distribution network means showing up in person. This meeting in Lyon was part of a push to expand Planet Soar's B2B relationships across the French renewable energy market.</p>
+              <span class="exp-card__cap-meta">Lyon, France</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="1" data-cat="1" tabindex="0" role="button" aria-label="Open With Founders of a Solar Power Company & Planet Soar CEOs">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/solar-power-founders.png" alt="With founders of a solar power company and Planet Soar CEOs" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Leadership · Networking</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">With Founders of a Solar Power Company &amp; Planet Soar CEOs</p>
+              <p class="exp-card__cap-desc">Strategic partnership meetings that shaped the supply chain decisions and product positioning driving our revenue growth.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Leadership</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="2" data-cat="1" tabindex="0" role="button" aria-label="Open Visiting Partners' Factory — Gaborone, Botswana">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/gaborone-factory.png" alt="Visiting partners' factory in Gaborone, Botswana" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">International · Botswana</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Visiting Partners' Factory — Gaborone, Botswana</p>
+              <p class="exp-card__cap-desc">An on-the-ground visit to a partner's manufacturing facility. Understanding production realities firsthand gave insights that no spec sheet could replicate.</p>
+              <span class="exp-card__cap-meta">Gaborone, Botswana</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 03 The Team ── -->
+    <section class="exp-chapter" data-cat="2">
+      <div class="exp-chapter__hd">
+        <span class="exp-chapter__num">03</span>
+        <h2 class="exp-chapter__name">The <em>Team</em></h2>
+        <span class="exp-chapter__hint" aria-hidden="true">
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true">
+            <path d="M0 4H13M13 4L10 1.5M13 4L10 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Drag to explore
+        </span>
+      </div>
+      <div class="exp-carousel">
+        <div class="exp-carousel__track">
+
+          <article class="exp-card" data-ci="0" data-cat="2" tabindex="0" role="button" aria-label="Open The Planet Soar Team">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/team-photo.png" alt="The Planet Soar team" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Team · Planet Soar</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">The Planet Soar Team</p>
+              <p class="exp-card__cap-desc">The people behind the numbers. Building €1.6M in annual revenue is a team effort — this is the group that showed up every day, solved the hard problems, and made the business run.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Team</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="1" data-cat="2" tabindex="0" role="button" aria-label="Open Planet Soar — Team Moment">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/team-photo-2.png" alt="Planet Soar team moment" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Team · Planet Soar</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Planet Soar — Team Moment</p>
+              <p class="exp-card__cap-desc">Another moment with the Planet Soar team. The culture we built — hands-on, commercial, driven — is what I carry into every next role.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Team</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="2" data-cat="2" tabindex="0" role="button" aria-label="Open Planet Soar — Professional Event">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/planet-soar-event.png" alt="Planet Soar professional event" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Planet Soar · Event</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Planet Soar — Professional Event</p>
+              <p class="exp-card__cap-desc">One of many professional moments captured during my time at Planet Soar — where every event, meeting, and product launch was another step in building something from the ground up.</p>
+              <span class="exp-card__cap-meta">Planet Soar</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 04 Product Studio ── -->
+    <section class="exp-chapter" data-cat="3">
+      <div class="exp-chapter__hd">
+        <span class="exp-chapter__num">04</span>
+        <h2 class="exp-chapter__name">Product <em>Studio</em></h2>
+        <span class="exp-chapter__hint" aria-hidden="true">
+          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden="true">
+            <path d="M0 4H13M13 4L10 1.5M13 4L10 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Drag to explore
+        </span>
+      </div>
+      <div class="exp-carousel">
+        <div class="exp-carousel__track">
+
+          <article class="exp-card" data-ci="0" data-cat="3" tabindex="0" role="button" aria-label="Open Distributed Product Presentation">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/distributed-product-presentation.png" alt="Distributed product presentation" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Product · Distribution</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Distributed Product Presentation</p>
+              <p class="exp-card__cap-desc">Presenting Planet Soar's product range to distribution partners. Getting our catalogue in front of the right buyers required a clear pitch and the ability to communicate value quickly.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Distribution</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="1" data-cat="3" tabindex="0" role="button" aria-label="Open Fixation Products Photo Shoot">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/fixation-products-photoshoot.png" alt="Fixation products photo shoot" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Product · Photo Shoot</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Fixation Products Photo Shoot</p>
+              <p class="exp-card__cap-desc">Hands-on with the fixation products range — one of many in-house photo shoots I organised and directed to keep our product imagery fresh and conversion-optimised across the shop.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Product</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="2" data-cat="3" tabindex="0" role="button" aria-label="Open Product Photoshoot">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/product-photoshoot.png" alt="Product photoshoot" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Product · Photo Shoot</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Product Photoshoot</p>
+              <p class="exp-card__cap-desc">Every new product needed clean, accurate imagery before going live. Managing the brief, the setup, and the post-processing meant our product pages always looked the part.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Product</span>
+            </div>
+          </article>
+
+          <article class="exp-card" data-ci="3" data-cat="3" tabindex="0" role="button" aria-label="Open Product Photo Shoot Session">
+            <div class="exp-card__img-wrap">
+              <img src="/img/experiences/product-photo-shooting.png" alt="Product photo shoot session" loading="lazy" draggable="false" />
+              <span class="exp-card__tag">Product · Photo Shoot</span>
+            </div>
+            <div class="exp-card__cap">
+              <p class="exp-card__cap-title">Product Photo Shoot Session</p>
+              <p class="exp-card__cap-desc">Another shoot from the catalogue production workflow. With hundreds of SKUs across the range, keeping imagery up to standard was an ongoing operation that directly shaped click-through rates.</p>
+              <span class="exp-card__cap-meta">Planet Soar · Product</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /exp-chapters -->
+
+  <!-- ── LIGHTBOX ── -->
+  <div class="exp-lb" id="exp-lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <div class="exp-lb__bg" id="exp-lb-bg"></div>
+    <div class="exp-lb__dialog">
+      <div class="exp-lb__iw" id="exp-lb-iw">
+        <img class="exp-lb__img" id="exp-lb-img" src="" alt="" />
+        <div class="exp-lb__zoom-pill" id="exp-lb-zp">Click to zoom</div>
+      </div>
+      <div class="exp-lb__foot">
+        <span class="exp-lb__ctr" id="exp-lb-ctr">1 / 2</span>
+        <p class="exp-lb__ttl" id="exp-lb-ttl"></p>
+        <span class="exp-lb__meta" id="exp-lb-meta"></span>
+      </div>
+    </div>
+    <button class="exp-lb__x" id="exp-lb-x" aria-label="Close lightbox">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="exp-lb__nav exp-lb__prv" id="exp-lb-prv" aria-label="Previous photo">
+      <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+        <path d="M9 15L1 8L9 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="exp-lb__nav exp-lb__nxt" id="exp-lb-nxt" aria-label="Next photo">
+      <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+        <path d="M1 1L9 8L1 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
 
   <!-- ── FOOTER ── -->
   <footer class="ftr">
     <div class="ftr__top">
 
-      <!-- Brand -->
       <div class="ftr__brand">
         <a href="/" class="ftr__logo">MC</a>
         <p class="ftr__tagline">E-Commerce Builder</p>
@@ -324,7 +855,6 @@
         </div>
       </div>
 
-      <!-- Navigation -->
       <nav class="ftr__nav" aria-label="Footer navigation">
         <p class="ftr__nav-label">Navigate</p>
         <ul class="ftr__nav-list">
@@ -338,7 +868,6 @@
         </ul>
       </nav>
 
-      <!-- Newsletter -->
       <div class="ftr__newsletter">
         <p class="ftr__nav-label">The Dispatch</p>
         <p class="ftr__newsletter-desc">New articles, case studies, and e-commerce thinking — straight to your inbox. No noise, no fluff.</p>
@@ -352,7 +881,6 @@
 
     </div>
 
-    <!-- Bottom bar -->
     <div class="ftr__bottom">
       <span>© 2026 Melvyn Cross</span>
       <span>Built on Vercel · Powered by Sanity</span>
@@ -360,47 +888,374 @@
     </div>
   </footer>
 
+  <!-- ══════════════════════════════════════════════════════
+       INTERACTIVE SCRIPTS
+       ══════════════════════════════════════════════════════ -->
   <script>
-    // ── Theme ──
-    (function(){
-      const btn = document.getElementById('theme-toggle');
-      if (!btn) return;
-      const set = t => {
+  (function () {
+    'use strict';
+
+    /* ── 1. Theme ── */
+    var btn = document.getElementById('theme-toggle');
+    if (btn) {
+      var setTheme = function (t) {
         document.documentElement.setAttribute('data-theme', t);
         btn.textContent = t === 'dark' ? '☀' : '☽';
         localStorage.setItem('mc_theme', t);
       };
-      set(document.documentElement.getAttribute('data-theme') || 'light');
-      btn.addEventListener('click', () =>
-        set(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
-    })();
+      setTheme(document.documentElement.getAttribute('data-theme') || 'light');
+      btn.addEventListener('click', function () {
+        setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    }
 
-    // ── Custom cursor ──
-    (function(){
-      if (!window.matchMedia('(pointer: fine)').matches) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      const dot = document.querySelector('.cursor-dot');
-      const ring = document.querySelector('.cursor-ring');
+    /* ── 2. Custom cursor ── */
+    (function () {
+      if (!window.matchMedia('(pointer:fine)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+      var dot = document.querySelector('.cursor-dot');
+      var ring = document.querySelector('.cursor-ring');
       if (!dot || !ring) return;
-      let mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,visible=false;
-      document.addEventListener('mousemove', e => {
+      var mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,vis=false;
+      document.addEventListener('mousemove', function(e){
         mX=e.clientX; mY=e.clientY;
-        if (!visible) { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); visible=true; }
+        if (!vis){ dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); vis=true; }
       });
-      document.addEventListener('mouseleave', () => { dot.classList.add('cursor-dot--hidden'); ring.classList.add('cursor-ring--hidden'); dot.classList.remove('cursor-dot--visible'); ring.classList.remove('cursor-ring--visible'); visible=false; });
-      document.addEventListener('mouseenter', () => { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); dot.classList.remove('cursor-dot--hidden'); ring.classList.remove('cursor-ring--hidden'); visible=true; });
-      document.addEventListener('mousedown', () => {
-        const r=document.createElement('div'); r.className='cursor-ripple'; r.style.left=mX+'px'; r.style.top=mY+'px';
-        document.body.appendChild(r); r.addEventListener('animationend',()=>r.remove(),{once:true});
+      document.addEventListener('mouseleave', function(){
+        dot.classList.add('cursor-dot--hidden'); ring.classList.add('cursor-ring--hidden');
+        dot.classList.remove('cursor-dot--visible'); ring.classList.remove('cursor-ring--visible'); vis=false;
       });
-      document.querySelectorAll('a,button,[role="button"]').forEach(el => {
-        el.addEventListener('mouseenter',()=>{ dot.classList.add('cursor-dot--hover'); ring.classList.add('cursor-ring--hover'); });
-        el.addEventListener('mouseleave',()=>{ dot.classList.remove('cursor-dot--hover'); ring.classList.remove('cursor-ring--hover'); });
+      document.addEventListener('mouseenter', function(){
+        dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible');
+        dot.classList.remove('cursor-dot--hidden'); ring.classList.remove('cursor-ring--hidden'); vis=true;
       });
-      const tick=()=>{ dX+=(mX-dX)*0.15; dY+=(mY-dY)*0.15; rX+=(mX-rX)*0.065; rY+=(mY-rY)*0.065; dot.style.transform=`translate(${dX}px,${dY}px) translate(-50%,-50%)`; ring.style.transform=`translate(${rX}px,${rY}px) translate(-50%,-50%)`; requestAnimationFrame(tick); };
+      document.addEventListener('mousedown', function(){
+        var r = document.createElement('div'); r.className='cursor-ripple';
+        r.style.left=mX+'px'; r.style.top=mY+'px';
+        document.body.appendChild(r);
+        r.addEventListener('animationend', function(){ r.remove(); }, {once:true});
+      });
+      document.querySelectorAll('a,button,[role="button"]').forEach(function(el){
+        el.addEventListener('mouseenter', function(){ dot.classList.add('cursor-dot--hover'); ring.classList.add('cursor-ring--hover'); });
+        el.addEventListener('mouseleave', function(){ dot.classList.remove('cursor-dot--hover'); ring.classList.remove('cursor-ring--hover'); });
+      });
+      var tick = function(){
+        dX += (mX-dX)*.15; dY += (mY-dY)*.15;
+        rX += (mX-rX)*.065; rY += (mY-rY)*.065;
+        dot.style.transform  = 'translate('+dX+'px,'+dY+'px) translate(-50%,-50%)';
+        ring.style.transform = 'translate('+rX+'px,'+rY+'px) translate(-50%,-50%)';
+        requestAnimationFrame(tick);
+      };
       tick();
     })();
+
+    /* ── 3. Hero reveal ── */
+    var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+    function heroReveal() {
+      if (reduced) {
+        document.getElementById('eh-pre').classList.add('is-vis');
+        ['hw0','hw1','hw2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.add('is-vis'); });
+        document.getElementById('eh-sub').classList.add('is-vis');
+        document.getElementById('eh-strip').classList.add('is-vis');
+        return;
+      }
+      var pre   = document.getElementById('eh-pre');
+      var words = ['hw0','hw1','hw2'].map(function(id){ return document.getElementById(id); });
+      var sub   = document.getElementById('eh-sub');
+      var strip = document.getElementById('eh-strip');
+
+      setTimeout(function(){ if(pre) pre.classList.add('is-vis'); }, 180);
+      words.forEach(function(w, i){ setTimeout(function(){ if(w) w.classList.add('is-vis'); }, 380 + i*110); });
+      setTimeout(function(){ if(sub) sub.classList.add('is-vis'); }, 680);
+      setTimeout(function(){
+        if(strip) strip.classList.add('is-vis');
+        // start counters after strip reveals
+        setTimeout(startCounters, 250);
+      }, 880);
+    }
+
+    function startCounters() {
+      ['cnt-0','cnt-1','cnt-2'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var val = parseFloat(el.dataset.val);
+        var pre = el.dataset.pre || '';
+        var suf = el.dataset.suf || '';
+        var isFloat = el.dataset.val.indexOf('.') !== -1;
+        var dur = 1400;
+        var start = Date.now();
+        function tick() {
+          var p = Math.min((Date.now()-start)/dur, 1);
+          var ease = 1 - Math.pow(1-p, 3);
+          var cur = val * ease;
+          el.textContent = pre + (isFloat ? cur.toFixed(1) : Math.round(cur)) + suf;
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        tick();
+      });
+    }
+
+    /* ── 4. Scroll reveal (IntersectionObserver) ── */
+    function initScrollReveal() {
+      var chapters = document.querySelectorAll('.exp-chapter');
+      if (!chapters.length) return;
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-vis');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+      chapters.forEach(function(c){ obs.observe(c); });
+    }
+
+    /* ── 5. Carousels with momentum drag ── */
+    function initCarousels() {
+      document.querySelectorAll('.exp-carousel').forEach(function(carousel) {
+        var track = carousel.querySelector('.exp-carousel__track');
+        if (!track) return;
+
+        var startX = 0, scrollL = 0, velX = 0, lastX = 0, lastT = 0;
+        var dragging = false, moved = false;
+        var raf = null;
+
+        function onDown(e) {
+          if (e.button !== undefined && e.button !== 0) return;
+          dragging = true; moved = false;
+          startX = e.clientX; scrollL = track.scrollLeft;
+          velX = 0; lastX = e.clientX; lastT = Date.now();
+          carousel.classList.add('is-drag');
+          cancelAnimationFrame(raf);
+          track.setPointerCapture && track.setPointerCapture(e.pointerId);
+        }
+
+        function onMove(e) {
+          if (!dragging) return;
+          var dx = e.clientX - startX;
+          if (Math.abs(dx) > 5) moved = true;
+          track.scrollLeft = scrollL - dx;
+          var now = Date.now(), dt = now - lastT;
+          if (dt > 0) velX = (lastX - e.clientX) / dt * 16;
+          lastX = e.clientX; lastT = now;
+        }
+
+        function onUp() {
+          if (!dragging) return;
+          dragging = false;
+          carousel.classList.remove('is-drag');
+          momentum();
+        }
+
+        function momentum() {
+          velX *= 0.91;
+          if (Math.abs(velX) < 0.4) return;
+          track.scrollLeft += velX;
+          raf = requestAnimationFrame(momentum);
+        }
+
+        track.addEventListener('pointerdown', onDown);
+        window.addEventListener('pointermove', function(e){ if(dragging) onMove(e); });
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
+
+        // Expose drag state for tilt
+        carousel._isDragging = function(){ return dragging || moved; };
+        carousel._wasMoved = function(){ return moved; };
+      });
+    }
+
+    /* ── 6. 3D card tilt ── */
+    function initTilt() {
+      if (!window.matchMedia('(pointer:fine)').matches) return;
+      if (reduced) return;
+
+      document.querySelectorAll('.exp-card').forEach(function(card) {
+        var carousel = card.closest('.exp-carousel');
+
+        card.addEventListener('mousemove', function(e) {
+          if (carousel && carousel._isDragging && carousel._isDragging()) return;
+          var r = card.getBoundingClientRect();
+          var cx = r.left + r.width/2, cy = r.top + r.height/2;
+          var dx = (e.clientX - cx) / r.width;
+          var dy = (e.clientY - cy) / r.height;
+          card.style.transform = 'perspective(900px) rotateY('+(dx*11)+'deg) rotateX('+(-dy*7)+'deg) scale3d(1.02,1.02,1.02)';
+          card.style.transition = 'box-shadow .4s ease';
+        });
+
+        card.addEventListener('mouseleave', function() {
+          card.style.transform = '';
+          card.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1), box-shadow .4s ease';
+        });
+      });
+    }
+
+    /* ── 7. Cursor gallery mode ── */
+    function initCursorGallery() {
+      document.querySelectorAll('.exp-carousel').forEach(function(el) {
+        el.addEventListener('mouseenter', function(){ document.body.classList.add('cursor--gallery'); });
+        el.addEventListener('mouseleave', function(){ document.body.classList.remove('cursor--gallery'); });
+      });
+    }
+
+    /* ── 8. Lightbox ── */
+    function initLightbox() {
+      var lb    = document.getElementById('exp-lb');
+      var lbBg  = document.getElementById('exp-lb-bg');
+      var lbIw  = document.getElementById('exp-lb-iw');
+      var lbImg = document.getElementById('exp-lb-img');
+      var lbZp  = document.getElementById('exp-lb-zp');
+      var lbCtr = document.getElementById('exp-lb-ctr');
+      var lbTtl = document.getElementById('exp-lb-ttl');
+      var lbMeta= document.getElementById('exp-lb-meta');
+      var lbX   = document.getElementById('exp-lb-x');
+      var lbPrv = document.getElementById('exp-lb-prv');
+      var lbNxt = document.getElementById('exp-lb-nxt');
+      if (!lb) return;
+
+      // Build category data from DOM
+      var categories = {};
+      document.querySelectorAll('.exp-card').forEach(function(card) {
+        var cat = card.dataset.cat;
+        var ci  = parseInt(card.dataset.ci, 10);
+        var imgEl = card.querySelector('img');
+        var ttlEl = card.querySelector('.exp-card__cap-title');
+        var metEl = card.querySelector('.exp-card__cap-meta');
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat][ci] = {
+          src: imgEl ? imgEl.src : '',
+          alt: imgEl ? imgEl.alt : '',
+          title: ttlEl ? ttlEl.textContent : '',
+          meta:  metEl ? metEl.textContent : ''
+        };
+      });
+
+      var curCat = '0', curIdx = 0, isZoomed = false;
+
+      function open(cat, idx) {
+        curCat = String(cat); curIdx = idx; isZoomed = false;
+        lbIw.classList.remove('zoomed');
+        lb.removeAttribute('hidden');
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ lb.classList.add('is-open'); });
+        });
+        document.body.style.overflow = 'hidden';
+        updateContent();
+        // Re-add zoom pill animation each open
+        lbZp.style.animation = 'none';
+        lbZp.offsetHeight; // reflow
+        lbZp.style.animation = '';
+      }
+
+      function close() {
+        lb.classList.remove('is-open');
+        document.body.style.overflow = '';
+        isZoomed = false;
+        lbIw.classList.remove('zoomed');
+        setTimeout(function(){ lb.setAttribute('hidden', ''); }, 350);
+      }
+
+      function updateContent() {
+        var items = categories[curCat] || [];
+        var item = items[curIdx] || {};
+        lbImg.src = item.src || '';
+        lbImg.alt = item.alt || '';
+        lbTtl.textContent = item.title || '';
+        lbMeta.textContent = item.meta || '';
+        lbCtr.textContent = (curIdx+1) + ' / ' + items.length;
+        lbPrv.disabled = curIdx === 0;
+        lbNxt.disabled = curIdx >= items.length - 1;
+        // Reset zoom on nav
+        isZoomed = false;
+        lbIw.classList.remove('zoomed');
+      }
+
+      function nav(dir) {
+        var items = categories[curCat] || [];
+        var next = curIdx + dir;
+        if (next < 0 || next >= items.length) return;
+        // Cross-fade
+        lbImg.style.opacity = '0';
+        lbImg.style.transform = 'scale(.95)';
+        setTimeout(function(){
+          curIdx = next;
+          updateContent();
+          lbImg.style.opacity = '';
+          lbImg.style.transform = '';
+        }, 160);
+      }
+
+      // Click on card opens lightbox
+      document.addEventListener('click', function(e) {
+        var card = e.target.closest('.exp-card');
+        if (!card) return;
+        // Don't open if we just dragged
+        var carousel = card.closest('.exp-carousel');
+        if (carousel && carousel._wasMoved && carousel._wasMoved()) return;
+        e.preventDefault();
+        open(card.dataset.cat, parseInt(card.dataset.ci, 10));
+      });
+
+      // Keyboard enter on focused card
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('exp-card')) {
+          var card = document.activeElement;
+          open(card.dataset.cat, parseInt(card.dataset.ci, 10));
+        }
+      });
+
+      // Zoom on image click
+      lbIw.addEventListener('click', function(e) {
+        if (e.target === lbImg || e.target === lbIw) {
+          isZoomed = !isZoomed;
+          lbIw.classList.toggle('zoomed', isZoomed);
+          if (isZoomed) {
+            // zoom toward click point
+            var r = lbIw.getBoundingClientRect();
+            var px = ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%';
+            var py = ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+            lbImg.style.transformOrigin = px+' '+py;
+          } else {
+            lbImg.style.transformOrigin = 'center center';
+          }
+        }
+      });
+
+      // Buttons
+      lbX.addEventListener('click', close);
+      lbBg.addEventListener('click', close);
+      lbPrv.addEventListener('click', function(){ nav(-1); });
+      lbNxt.addEventListener('click', function(){ nav(1); });
+
+      // Keyboard
+      document.addEventListener('keydown', function(e) {
+        if (!lb.classList.contains('is-open')) return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); nav(-1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nav(1); }
+      });
+
+      // Touch swipe
+      var tsX = 0;
+      lb.addEventListener('touchstart', function(e){ tsX = e.touches[0].clientX; }, {passive:true});
+      lb.addEventListener('touchend', function(e) {
+        var dx = e.changedTouches[0].clientX - tsX;
+        if (Math.abs(dx) > 50) { nav(dx < 0 ? 1 : -1); }
+      });
+    }
+
+    /* ── Init ── */
+    heroReveal();
+    initScrollReveal();
+    initCarousels();
+    initTilt();
+    initCursorGallery();
+    initLightbox();
+
+  })();
   </script>
+
   <script src="page-transition.js"></script>
   <script src="cookie-consent.js"></script>
   <script src="ftr-subscribe.js"></script>
