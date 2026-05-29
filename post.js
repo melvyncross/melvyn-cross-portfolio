@@ -287,19 +287,66 @@ function initSharing(title) {
 function injectMeta(post, canonicalUrl, ogImg) {
   document.title=`${post.title} — Melvyn Cross`;
   const set=(sel,val)=>{const el=document.querySelector(sel);if(el)el.setAttribute('content',val);};
+  const setLink=(sel,val)=>{const el=document.querySelector(sel);if(el)el.setAttribute('href',val);};
+
+  // Core meta
   set('meta[name="description"]',post.excerpt||'');
+
+  // Canonical + hreflang
+  setLink('#canonical-url',canonicalUrl);
+  setLink('#hreflang-en',canonicalUrl);
+  setLink('#hreflang-fr',canonicalUrl);
+  setLink('#hreflang-default',canonicalUrl);
+
+  // Open Graph
   set('meta[property="og:url"]',canonicalUrl);
   set('meta[property="og:title"]',post.title);
   set('meta[property="og:description"]',post.excerpt||'');
-  if(ogImg){set('meta[property="og:image"]',ogImg);set('meta[name="twitter:image"]',ogImg);}
+  set('meta[property="article:published_time"]',post.publishedAt||'');
+  set('meta[property="article:section"]',CAT[post.category]||post.category||'');
+  if(ogImg){
+    set('meta[property="og:image"]',ogImg);
+    set('meta[name="twitter:image"]',ogImg);
+  }
+
+  // Twitter
   set('meta[name="twitter:title"]',post.title);
   set('meta[name="twitter:description"]',post.excerpt||'');
+
+  // Count words for JSON-LD
+  let wordCount=0;
+  (post.body||[]).forEach(b=>b._type==='block'&&b.children?.forEach(s=>{if(s.text)wordCount+=s.text.split(/\s+/).filter(Boolean).length;}));
+
+  // JSON-LD: BlogPosting (rich structured data for AI + Google)
   document.getElementById('jsonld-article').textContent=JSON.stringify({
-    '@context':'https://schema.org','@type':'Article',
-    headline:post.title,description:post.excerpt||'',
+    '@context':'https://schema.org',
+    '@type':'BlogPosting',
+    '@id':canonicalUrl,
+    mainEntityOfPage:{'@type':'WebPage','@id':canonicalUrl},
+    headline:post.title,
+    description:post.excerpt||'',
     datePublished:post.publishedAt,
-    author:{'@type':'Person',name:'Melvyn Cross',url:'https://melvyncross.com'},
-    url:canonicalUrl,...(ogImg?{image:ogImg}:{})
+    dateModified:post.publishedAt,
+    inLanguage:'en-GB',
+    author:{
+      '@type':'Person',
+      '@id':'https://melvyncross.com/#person',
+      name:'Melvyn Cross',
+      url:'https://melvyncross.com'
+    },
+    publisher:{
+      '@type':'Person',
+      '@id':'https://melvyncross.com/#person',
+      name:'Melvyn Cross',
+      url:'https://melvyncross.com'
+    },
+    isPartOf:{'@id':'https://melvyncross.com/blog#blog'},
+    ...(ogImg?{image:{
+      '@type':'ImageObject',url:ogImg,width:1200,height:630
+    }}:{}),
+    ...(post.tags?.length?{keywords:post.tags.join(', ')}:{}),
+    ...(wordCount?{wordCount}:{}),
+    url:canonicalUrl
   });
 }
 

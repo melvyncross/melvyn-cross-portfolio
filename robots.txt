@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block serverless API routes from crawlers
+Disallow: /api/
+
+# Block Vercel internals
+Disallow: /_vercel/
+
+Sitemap: https://melvyncross.com/sitemap.xml

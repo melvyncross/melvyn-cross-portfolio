@@ -5,25 +5,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Melvyn Cross — E-commerce Builder</title>
   <meta name="description" content="Six years building planetsoarshop.com from zero to €1.6M in annual revenue. Bilingual EN/FR e-commerce manager open to UK roles." />
+  <meta name="author" content="Melvyn Cross" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#F4A547" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://melvyncross.com/" />
+
+  <!-- Hreflang — bilingual EN/FR -->
+  <link rel="alternate" hreflang="en" href="https://melvyncross.com/" />
+  <link rel="alternate" hreflang="fr" href="https://melvyncross.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://melvyncross.com/" />
 
   <!-- Open Graph -->
+  <meta property="og:site_name" content="Melvyn Cross" />
+  <meta property="og:locale" content="en_GB" />
+  <meta property="og:locale:alternate" content="fr_FR" />
   <meta property="og:title" content="Melvyn Cross — E-commerce Builder" />
   <meta property="og:description" content="Six years building planetsoarshop.com from zero to €1.6M annual revenue. Bilingual EN/FR e-commerce manager open to UK roles." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://melvyncross.com" />
-  <meta property="og:image" content="https://melvyncross.com/img/portrait.jpg" />
+  <meta property="og:url" content="https://melvyncross.com/" />
+  <meta property="og:image" content="https://melvyncross.com/img/og-card.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Melvyn Cross — E-commerce Builder" />
 
   <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@melvyncross" />
   <meta name="twitter:title" content="Melvyn Cross — E-commerce Builder" />
   <meta name="twitter:description" content="Six years building planetsoarshop.com from zero to €1.6M annual revenue. Bilingual EN/FR e-commerce manager open to UK roles." />
-  <meta name="twitter:image" content="https://melvyncross.com/img/portrait.jpg" />
+  <meta name="twitter:image" content="https://melvyncross.com/img/og-card.jpg" />
+
+  <!-- JSON-LD: Person + WebSite + ProfilePage -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://melvyncross.com/#person",
+      "name": "Melvyn Cross",
+      "url": "https://melvyncross.com",
+      "image": "https://melvyncross.com/img/portrait.jpg",
+      "jobTitle": "E-commerce Manager",
+      "description": "Bilingual EN/FR e-commerce manager who grew Planet Soar from zero to €1.6M annual revenue over six years.",
+      "knowsLanguage": ["en", "fr"],
+      "sameAs": [
+        "https://www.linkedin.com/in/melvyn-cross"
+      ],
+      "alumniOf": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "ISG Paris",
+          "url": "https://www.isg.fr"
+        },
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "IUT de Lens",
+          "url": "https://iut-lens.univ-artois.fr"
+        }
+      ],
+      "knowsAbout": ["E-commerce", "SEO", "Digital Marketing", "AI in Retail", "Shopify", "Google Analytics"]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://melvyncross.com/#website",
+      "url": "https://melvyncross.com",
+      "name": "Melvyn Cross",
+      "description": "Portfolio of Melvyn Cross — e-commerce builder, writer, and digital strategist.",
+      "inLanguage": ["en", "fr"],
+      "author": { "@id": "https://melvyncross.com/#person" }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      "@id": "https://melvyncross.com/#profilepage",
+      "url": "https://melvyncross.com",
+      "name": "Melvyn Cross — E-commerce Builder",
+      "description": "Six years building planetsoarshop.com from zero to €1.6M in annual revenue.",
+      "mainEntity": { "@id": "https://melvyncross.com/#person" },
+      "isPartOf": { "@id": "https://melvyncross.com/#website" }
+    }
+  ]
+  </script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://p4gxllem.apicdn.sanity.io" crossorigin />
+  <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Prevent flash of wrong theme — runs before CSS paints -->
