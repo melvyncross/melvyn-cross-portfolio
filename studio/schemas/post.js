@@ -152,6 +152,70 @@ export const post = {
       description: 'Pin to top of blog listing.',
       initialValue: false,
     },
+
+    // ── French translations ────────────────────────────────────────────────
+    {
+      name: 'title_fr',
+      title: 'Title (French)',
+      type: 'string',
+      description: 'French version of the title. Leave blank to fall back to English.',
+    },
+    {
+      name: 'excerpt_fr',
+      title: 'Excerpt (French)',
+      type: 'text',
+      rows: 3,
+      description: 'French version of the excerpt (max 200 chars).',
+      validation: (Rule) => Rule.max(200),
+    },
+    {
+      name: 'body_fr',
+      title: 'Body (French)',
+      type: 'array',
+      description: 'French version of the article body.',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'Heading 2', value: 'h2' },
+            { title: 'Heading 3', value: 'h3' },
+            { title: 'Heading 4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+          ],
+          lists: [
+            { title: 'Bullet', value: 'bullet' },
+            { title: 'Numbered', value: 'number' },
+          ],
+          marks: {
+            decorators: [
+              { title: 'Bold', value: 'strong' },
+              { title: 'Italic', value: 'em' },
+              { title: 'Code', value: 'code' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  { name: 'href', type: 'url', title: 'URL' },
+                  { name: 'blank', title: 'Open in new tab', type: 'boolean', initialValue: true },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            { name: 'alt', title: 'Alt text', type: 'string' },
+            { name: 'caption', title: 'Caption', type: 'string' },
+          ],
+        },
+      ],
+    },
   ],
 
   orderings: [

@@ -107,10 +107,27 @@ function renderBody(blocks=[]) {
 // SANITY FETCHES
 // ─────────────────────────────────────────────────────────────────────────────
 async function fetchPost(slugVal) {
-  const q=encodeURIComponent(`*[_type=="post"&&slug.current=="${slugVal}"][0]{_id,title,slug,publishedAt,category,tags,excerpt,coverImage{asset,alt},body[]{...,_type=="image"=>{...,asset->}},featured}`);
+  const q=encodeURIComponent(`*[_type=="post"&&slug.current=="${slugVal}"][0]{_id,title,title_fr,slug,publishedAt,category,tags,excerpt,excerpt_fr,coverImage{asset,alt},body[]{...,_type=="image"=>{...,asset->}},body_fr[]{...,_type=="image"=>{...,asset->}},featured}`);
   const r=await fetch(`${CDN}?query=${q}`);
   if(!r.ok) throw new Error(r.status);
   return (await r.json()).result||null;
+}
+
+// ── Apply language-specific content to an already-rendered post ───────────────
+function applyPostLang(post, lang) {
+  const title = (lang==='fr' && post.title_fr) ? post.title_fr : post.title;
+  const body  = (lang==='fr' && post.body_fr?.length) ? post.body_fr : post.body;
+
+  document.getElementById('pt-title').textContent = title;
+  document.getElementById('pt-breadcrumb-title').textContent = title;
+
+  _tocEntries = [];
+  const bodyEl = document.getElementById('pt-body');
+  if (bodyEl) bodyEl.innerHTML = renderBody(body || []);
+  buildTOC(_tocEntries);
+
+  document.getElementById('pt-read').textContent = `${readTime(body)} min read`;
+  initSharing(title);
 }
 
 async function fetchAdjacent(publishedAt) {
@@ -471,6 +488,15 @@ async function main() {
     }
     const [adjacent,more]=await Promise.all([fetchAdjacent(post.publishedAt),fetchMore(slugVal,post.publishedAt)]);
     renderPost(post,adjacent,more);
+
+    // Apply stored language on load, then re-apply on toggle
+    let postLang = localStorage.getItem('mc_lang') || 'en';
+    if (postLang === 'fr') applyPostLang(post, 'fr');
+    document.getElementById('lang-toggle')?.addEventListener('click', () => {
+      postLang = postLang === 'en' ? 'fr' : 'en';
+      applyPostLang(post, postLang);
+    });
+
   } catch(e) {
     console.error('[post]',e);
     document.getElementById('pt-loading').hidden=true;

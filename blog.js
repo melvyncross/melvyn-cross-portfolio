@@ -50,11 +50,13 @@ function readTime(body) {
 const CAT = {ecommerce:'E-Commerce',ai:'AI',market:'Market',opinion:'Opinion',strategy:'Strategy'};
 
 // ── render a card ─────────────────────────────────────────────────────────────
-function card(p, size='small') {
-  const url  = imgUrl(p.coverImage?.asset?._ref, size==='featured' ? 1400 : 800);
-  const slug = p.slug?.current||'';
-  const cat  = CAT[p.category]||p.category||'';
-  const mins = readTime(p.body);
+function card(p, size='small', lang='en') {
+  const url   = imgUrl(p.coverImage?.asset?._ref, size==='featured' ? 1400 : 800);
+  const slug  = p.slug?.current||'';
+  const cat   = CAT[p.category]||p.category||'';
+  const mins  = readTime(p.body);
+  const title = (lang==='fr' && p.title_fr) ? p.title_fr : (p.title||'');
+  const cta   = lang==='fr' ? 'Lire l\'article →' : 'Read story →';
 
   return `
     <a href="/post?slug=${encodeURIComponent(slug)}" class="bl-card bl-card--${size}">
@@ -65,13 +67,13 @@ function card(p, size='small') {
           ${cat ? `<span class="bl-tag">${esc(cat)}</span>` : ''}
         </div>
         <div class="bl-card__bottom">
-          <h${size==='featured'?'2':'3'} class="bl-card__title">${esc(p.title||'')}</h${size==='featured'?'2':'3'}>
+          <h${size==='featured'?'2':'3'} class="bl-card__title">${esc(title)}</h${size==='featured'?'2':'3'}>
           <div class="bl-card__meta">
             <span>${fmtDate(p.publishedAt)}</span>
             <span class="bl-card__dot">·</span>
             <span>${mins} min read</span>
           </div>
-          ${size==='small' ? '<div class="bl-card__arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M14.086 7.5L11.404 4.818 12.11 4.11 16 8l-3.89 3.89-.707-.707L14.086 8.5H0v-1h14.086z"/></svg></div>' : '<div class="bl-card__cta">Read story →</div>'}
+          ${size==='small' ? '<div class="bl-card__arrow"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M14.086 7.5L11.404 4.818 12.11 4.11 16 8l-3.89 3.89-.707-.707L14.086 8.5H0v-1h14.086z"/></svg></div>' : `<div class="bl-card__cta">${cta}</div>`}
         </div>
       </div>
     </a>
@@ -80,7 +82,7 @@ function card(p, size='small') {
 
 // ── fetch ─────────────────────────────────────────────────────────────────────
 async function fetchPosts() {
-  const q = encodeURIComponent(`*[_type=="post"]|order(publishedAt desc){_id,title,slug,publishedAt,category,excerpt,coverImage{asset,alt},body}`);
+  const q = encodeURIComponent(`*[_type=="post"]|order(publishedAt desc){_id,title,title_fr,slug,publishedAt,category,excerpt,excerpt_fr,coverImage{asset,alt},body}`);
   const r = await fetch(`${CDN}?query=${q}`);
   if (!r.ok) throw new Error(r.status);
   return (await r.json()).result||[];
@@ -176,6 +178,28 @@ function initReveal() {
   items.forEach(el => obs.observe(el));
 }
 
+// ── render cards for a given language ────────────────────────────────────────
+function renderCards(posts, lang, rebindHover) {
+  const featEl = document.querySelector('.bl-card--featured');
+  const grid   = document.getElementById('bl-grid');
+  if (!featEl || !posts.length) return;
+
+  // Replace featured card in place
+  featEl.outerHTML = card(posts[0], 'featured', lang);
+
+  // Replace grid cards
+  if (posts.length > 1 && grid) {
+    grid.innerHTML = posts.slice(1).map((p, i) => {
+      const delay = `${(i % 3) * 0.1}s`;
+      return card(p, 'small', lang).replace(
+        `class="bl-card bl-card--small"`,
+        `class="bl-card bl-card--small bl-reveal is-visible" style="--bl-delay:${delay}"`
+      );
+    }).join('');
+  }
+  if (rebindHover) rebindHover();
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 async function main() {
   initTheme();
@@ -186,6 +210,8 @@ async function main() {
   const empty     = document.getElementById('bl-empty');
   const error     = document.getElementById('bl-error');
   const featCard  = document.getElementById('bl-featured-card');
+
+  let cardLang = localStorage.getItem('mc_lang') || 'en';
 
   try {
     const posts = await fetchPosts();
@@ -201,24 +227,26 @@ async function main() {
       return;
     }
 
-    // Featured = first post (animate in via CSS)
-    featCard.outerHTML = card(posts[0], 'featured');
-
-    // Rest in grid — staggered scroll reveal
+    // Initial render
+    featCard.outerHTML = card(posts[0], 'featured', cardLang);
     if (posts.length > 1) {
       grid.innerHTML = posts.slice(1).map((p, i) => {
-        const delay = `${(i % 3) * 0.1}s`; // stagger within each row
-        return card(p, 'small').replace(
+        const delay = `${(i % 3) * 0.1}s`;
+        return card(p, 'small', cardLang).replace(
           `class="bl-card bl-card--small"`,
           `class="bl-card bl-card--small bl-reveal" style="--bl-delay:${delay}"`
         );
       }).join('');
       grid.hidden = false;
     }
-
     requestAnimationFrame(initReveal);
-    // Re-bind hover states after cards are added to DOM
     if (rebindHover) rebindHover();
+
+    // Re-render cards on lang toggle
+    document.getElementById('lang-toggle')?.addEventListener('click', () => {
+      cardLang = cardLang === 'en' ? 'fr' : 'en';
+      renderCards(posts, cardLang, rebindHover);
+    });
 
   } catch(e) {
     console.error('[blog]',e);
