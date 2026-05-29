@@ -37,6 +37,7 @@
       <a href="/blog" class="nav__blog-link">The Dispatch</a>
       <a href="/books" class="nav__blog-link">My reads</a>
       <button class="nav__theme" id="theme-toggle" aria-label="Toggle dark mode">☽</button>
+      <button class="nav__lang" id="lang-toggle" aria-label="Switch language">FR</button>
     </div>
   </nav>
 
@@ -289,6 +290,22 @@
       });
       const tick=()=>{ dX+=(mX-dX)*0.15; dY+=(mY-dY)*0.15; rX+=(mX-rX)*0.065; rY+=(mY-rY)*0.065; dot.style.transform=`translate(${dX}px,${dY}px) translate(-50%,-50%)`; ring.style.transform=`translate(${rX}px,${rY}px) translate(-50%,-50%)`; requestAnimationFrame(tick); };
       tick();
+    })();
+  
+    // ── Language toggle (syncs label from stored preference) ──
+    (function(){
+      var btn = document.getElementById('lang-toggle');
+      if (!btn) return;
+      var lang = localStorage.getItem('mc_lang') || 'en';
+      btn.textContent = lang === 'en' ? 'FR' : 'EN';
+      btn.setAttribute('aria-label', lang === 'en' ? 'Passer en français' : 'Switch to English');
+      btn.addEventListener('click', function(){
+        lang = lang === 'en' ? 'fr' : 'en';
+        localStorage.setItem('mc_lang', lang);
+        document.documentElement.lang = lang;
+        btn.textContent = lang === 'en' ? 'FR' : 'EN';
+        btn.setAttribute('aria-label', lang === 'en' ? 'Passer en français' : 'Switch to English');
+      });
     })();
   </script>
   <script type="module" src="qua-content.js"></script>
