@@ -31,7 +31,8 @@ function fmtDate(iso) {
   if (!iso) return '';
   return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 }
-function readTime(body=[]) {
+function readTime(body) {
+  if (!Array.isArray(body)) return 1;
   let w=0;
   body.forEach(b=>b._type==='block'&&b.children?.forEach(s=>{if(s.text)w+=s.text.split(/\s+/).filter(Boolean).length;}));
   return Math.max(1,Math.ceil(w/238));
