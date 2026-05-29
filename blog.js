@@ -25,7 +25,7 @@ function imgUrl(ref, w=1200) {
   if (!ref) return null;
   const parts = ref.replace('image-','').split('-');
   const ext = parts.pop(); const id = parts.join('-');
-  return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${w}&auto=format&fit=crop&sat=-5`;
+  return `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/${id}.${ext}?w=${w}&auto=format&fit=crop`;
 }
 function fmtDate(iso) {
   if (!iso) return '';
