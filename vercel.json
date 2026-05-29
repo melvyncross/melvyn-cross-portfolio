@@ -3,6 +3,9 @@
   "trailingSlash": false,
   "outputDirectory": ".",
   "buildCommand": "node scripts/fetch-content.js",
+  "redirects": [
+    { "source": "/404", "destination": "/404.html", "permanent": false }
+  ],
   "headers": [
     {
       "source": "/(.*)",

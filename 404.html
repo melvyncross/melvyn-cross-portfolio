@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page Not Found · Melvyn Cross</title>
+  <meta name="description" content="This page doesn't exist. But the rest of the site does." />
+  <meta name="robots" content="noindex, follow" />
+  <meta name="theme-color" content="#F4A547" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <script>(function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ── 404 page — dark cinematic, always dark regardless of theme ── */
+    .nf-page {
+      min-height: 100vh;
+      background: #080d16;
+      color: #F5EDE0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Noise texture overlay */
+    .nf-page::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial glow */
+    .nf-glow {
+      position: fixed;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(244,165,71,0.06) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Nav override for dark page */
+    .nf-page .nav {
+      background: transparent;
+      border-bottom-color: rgba(245,237,224,0.08);
+    }
+    .nf-page .nav__mark,
+    .nf-page .nav__blog-link,
+    .nf-page .nav__theme,
+    .nf-page .nav__lang {
+      color: #F5EDE0;
+    }
+    .nf-page .nav__contact-cta {
+      color: #F4A547;
+      border-color: rgba(244,165,71,0.4);
+    }
+
+    /* Hero */
+    .nf-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* The 404 number — massive Fraunces */
+    .nf-code {
+      font-family: var(--serif, 'Fraunces', Georgia, serif);
+      font-size: clamp(7rem, 22vw, 16rem);
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: -0.05em;
+      line-height: 0.9;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(244, 165, 71, 0.6);
+      position: relative;
+      margin-bottom: 0.5rem;
+      animation: nf-fade-in 0.8s ease both;
+      user-select: none;
+    }
+
+    /* The amber "4" in the middle */
+    .nf-code .nf-accent {
+      color: #F4A547;
+      -webkit-text-stroke: 0;
+    }
+
+    /* Glitch animation on the first 4 */
+    .nf-code .nf-glitch {
+      position: relative;
+      display: inline-block;
+      animation: nf-glitch 4s infinite;
+    }
+    .nf-code .nf-glitch::before,
+    .nf-code .nf-glitch::after {
+      content: '4';
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(244, 165, 71, 0.6);
+    }
+    .nf-code .nf-glitch::before {
+      animation: nf-glitch-top 4s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+      color: rgba(244,165,71,0.3);
+      -webkit-text-stroke: 0;
+    }
+    .nf-code .nf-glitch::after {
+      animation: nf-glitch-bot 4s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+      color: rgba(100,150,255,0.2);
+      -webkit-text-stroke: 0;
+    }
+
+    @keyframes nf-glitch {
+      0%, 90%, 100% { transform: none; }
+      91% { transform: translateX(-3px); }
+      93% { transform: translateX(3px); }
+      95% { transform: translateX(-2px); }
+    }
+    @keyframes nf-glitch-top {
+      0%, 90%, 100% { transform: none; opacity: 0; }
+      91% { transform: translateX(4px); opacity: 1; }
+      93% { transform: translateX(-4px); opacity: 1; }
+      95% { transform: none; opacity: 0; }
+    }
+    @keyframes nf-glitch-bot {
+      0%, 90%, 100% { transform: none; opacity: 0; }
+      92% { transform: translateX(-3px); opacity: 1; }
+      94% { transform: translateX(3px); opacity: 1; }
+      96% { transform: none; opacity: 0; }
+    }
+
+    @keyframes nf-fade-in {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Label above */
+    .nf-label {
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #F4A547;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: nf-fade-in 0.6s 0.1s ease forwards;
+    }
+
+    /* Heading */
+    .nf-heading {
+      font-family: var(--serif, 'Fraunces', Georgia, serif);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 300;
+      color: #F5EDE0;
+      margin: 1.5rem 0 0.75rem;
+      opacity: 0;
+      animation: nf-fade-in 0.6s 0.3s ease forwards;
+    }
+    .nf-heading em {
+      font-style: italic;
+      color: #F4A547;
+    }
+
+    /* Subtext */
+    .nf-sub {
+      font-family: var(--sans, 'Inter Tight', sans-serif);
+      font-size: 1rem;
+      color: rgba(245,237,224,0.5);
+      max-width: 38ch;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+      opacity: 0;
+      animation: nf-fade-in 0.6s 0.45s ease forwards;
+    }
+
+    /* CTA button */
+    .nf-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      color: #0A1628;
+      background: #F4A547;
+      padding: 0.9rem 2rem;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.2s;
+      opacity: 0;
+      animation: nf-fade-in 0.6s 0.6s ease forwards;
+    }
+    .nf-cta:hover {
+      background: #f5b468;
+      transform: translateY(-2px);
+    }
+    .nf-cta:active { transform: translateY(0); }
+
+    /* Quick links below CTA */
+    .nf-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      justify-content: center;
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: nf-fade-in 0.6s 0.75s ease forwards;
+    }
+    .nf-links a {
+      font-family: var(--mono, 'JetBrains Mono', monospace);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(245,237,224,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nf-links a:hover { color: #F4A547; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .nf-code, .nf-label, .nf-heading, .nf-sub, .nf-cta, .nf-links {
+        animation: none;
+        opacity: 1;
+      }
+      .nf-code .nf-glitch, .nf-code .nf-glitch::before, .nf-code .nf-glitch::after {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body class="nf-page">
+
+  <div class="nf-glow" aria-hidden="true"></div>
+
+  <!-- Page transition curtain -->
+  <div id="pt-curtain" style="position:fixed;inset:0;background:#080d16;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;pointer-events:none;">
+    <span style="font-family:'Fraunces','Times New Roman',serif;font-size:clamp(3.5rem,10vw,6rem);font-style:italic;font-weight:400;letter-spacing:-0.03em;color:#F5EDE0;line-height:1;user-select:none;">MC</span>
+    <span class="pt-dot" style="width:5px;height:5px;border-radius:50%;background:#F4A547;"></span>
+  </div>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot"  aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Nav -->
+  <nav class="nav blog-nav">
+    <a href="/" class="nav__mark">MC</a>
+    <div class="nav__meta">
+      <a href="/contact" target="_blank" rel="noopener noreferrer" class="nav__contact-cta">Contact me</a>
+      <a href="/qualifications" class="nav__blog-link">My qualifications</a>
+      <a href="/experiences" class="nav__blog-link">In the field</a>
+      <a href="/education" class="nav__blog-link">My education</a>
+      <a href="/blog" class="nav__blog-link">The Dispatch</a>
+      <a href="/books" class="nav__blog-link">My reads</a>
+      <button class="nav__theme" id="theme-toggle" aria-label="Toggle dark mode">☽</button>
+      <button class="nav__lang" id="lang-toggle" aria-label="Switch language">FR</button>
+    </div>
+  </nav>
+
+  <!-- 404 Hero -->
+  <main class="nf-hero" role="main">
+    <p class="nf-label" aria-hidden="true">Error · 404</p>
+
+    <div class="nf-code" aria-label="404">
+      <span class="nf-glitch">4</span><span class="nf-accent">0</span><span>4</span>
+    </div>
+
+    <h1 class="nf-heading">This page got <em>lost in transit</em>.</h1>
+    <p class="nf-sub">The URL you followed doesn't exist — or maybe it moved. Either way, it's not here.</p>
+
+    <a href="/" class="nf-cta">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M1.914 8.5l2.682 2.682.708-.707L3.121 8.5H16v-1H3.121l2.183-2.182-.708-.707z"/>
+      </svg>
+      Back to the homepage
+    </a>
+
+    <nav class="nf-links" aria-label="Quick links">
+      <a href="/blog">The Dispatch</a>
+      <a href="/education">My Education</a>
+      <a href="/experiences">In the Field</a>
+      <a href="/contact">Contact me</a>
+    </nav>
+  </main>
+
+  <script>
+    (function(){
+      var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme',t);
+      var btn=document.getElementById('theme-toggle');
+      if(btn){btn.textContent=t==='dark'?'☀':'☽';btn.addEventListener('click',function(){t=t==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);btn.textContent=t==='dark'?'☀':'☽';localStorage.setItem('mc_theme',t);});}
+    })();
+    (function(){
+      if(!window.matchMedia('(pointer:fine)').matches)return;
+      if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+      var dot=document.querySelector('.cursor-dot'),ring=document.querySelector('.cursor-ring');
+      if(!dot||!ring)return;
+      var mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,vis=false;
+      document.addEventListener('mousemove',function(e){mX=e.clientX;mY=e.clientY;if(!vis){dot.classList.add('cursor-dot--visible');ring.classList.add('cursor-ring--visible');vis=true;}});
+      document.querySelectorAll('a,button').forEach(function(el){el.addEventListener('mouseenter',function(){dot.classList.add('cursor-dot--hover');ring.classList.add('cursor-ring--hover');});el.addEventListener('mouseleave',function(){dot.classList.remove('cursor-dot--hover');ring.classList.remove('cursor-ring--hover');});});
+      (function tick(){dX+=(mX-dX)*0.15;dY+=(mY-dY)*0.15;rX+=(mX-rX)*0.065;rY+=(mY-rY)*0.065;dot.style.transform='translate('+dX+'px,'+dY+'px) translate(-50%,-50%)';ring.style.transform='translate('+rX+'px,'+rY+'px) translate(-50%,-50%)';requestAnimationFrame(tick);})();
+    })();
+    (function(){
+      var btn=document.getElementById('lang-toggle');if(!btn)return;
+      var lang=localStorage.getItem('mc_lang')||'en';
+      btn.textContent=lang==='en'?'FR':'EN';
+      btn.addEventListener('click',function(){lang=lang==='en'?'fr':'en';localStorage.setItem('mc_lang',lang);document.documentElement.lang=lang;btn.textContent=lang==='en'?'FR':'EN';});
+    })();
+  </script>
+  <script src="page-transition.js"></script>
+</body>
+</html>

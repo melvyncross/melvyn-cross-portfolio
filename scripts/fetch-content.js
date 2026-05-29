@@ -366,6 +366,71 @@ export default content;
   const outPath = join(__dirname, '..', 'content.js');
   writeFileSync(outPath, generated, 'utf8');
   console.log('[fetch-content] ✅ content.js written from Sanity data (homepage + 4 sub-pages)');
+
+  // ── Regenerate sitemap.xml with live blog posts ──────────────────────────
+  await generateSitemap();
+}
+
+async function generateSitemap() {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  // Fetch all published blog posts
+  let posts = [];
+  try {
+    posts = await client.fetch(
+      `*[_type == "post" && defined(publishedAt)] | order(publishedAt desc) { slug, publishedAt, _updatedAt }`
+    );
+    console.log(`[fetch-content] Found ${posts.length} blog post(s) for sitemap`);
+  } catch (err) {
+    console.warn('[fetch-content] Could not fetch posts for sitemap — using static pages only');
+    console.warn('[fetch-content]', err.message);
+  }
+
+  const ORIGIN = 'https://melvyncross.com';
+
+  // Static pages
+  const staticPages = [
+    { url: `${ORIGIN}/`,               lastmod: today, changefreq: 'monthly',  priority: '1.0' },
+    { url: `${ORIGIN}/blog`,           lastmod: today, changefreq: 'weekly',   priority: '0.9' },
+    { url: `${ORIGIN}/contact`,        lastmod: today, changefreq: 'yearly',   priority: '0.8' },
+    { url: `${ORIGIN}/education`,      lastmod: today, changefreq: 'yearly',   priority: '0.7' },
+    { url: `${ORIGIN}/qualifications`, lastmod: today, changefreq: 'yearly',   priority: '0.7' },
+    { url: `${ORIGIN}/experiences`,    lastmod: today, changefreq: 'yearly',   priority: '0.6' },
+    { url: `${ORIGIN}/books`,          lastmod: today, changefreq: 'monthly',  priority: '0.6' },
+    { url: `${ORIGIN}/privacy`,        lastmod: today, changefreq: 'yearly',   priority: '0.3' },
+  ];
+
+  // Blog post pages
+  const postPages = posts.map(p => ({
+    url: `${ORIGIN}/post?slug=${encodeURIComponent(p.slug.current)}`,
+    lastmod: (p._updatedAt || p.publishedAt || today).slice(0, 10),
+    changefreq: 'monthly',
+    priority: '0.8',
+  }));
+
+  const allPages = [...staticPages, ...postPages];
+
+  const urlEntries = allPages.map(page => `
+  <url>
+    <loc>${page.url}</loc>
+    <lastmod>${page.lastmod}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="${page.url}"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="${page.url}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${page.url}"/>
+  </url>`).join('');
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urlEntries}
+</urlset>
+`;
+
+  const sitemapPath = join(__dirname, '..', 'sitemap.xml');
+  writeFileSync(sitemapPath, sitemap, 'utf8');
+  console.log(`[fetch-content] ✅ sitemap.xml written — ${allPages.length} URLs (${posts.length} blog posts)`);
 }
 
 main().catch((err) => {
