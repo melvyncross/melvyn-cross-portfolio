@@ -12,9 +12,26 @@
  */
 
 const RESEND_URL    = 'https://api.resend.com/emails';
+const RESEND_CONTACTS_URL = 'https://api.resend.com/audiences';
 const FROM_SENDER   = 'Melvyn Cross <onboarding@resend.dev>';
 const FROM_SYSTEM   = 'Portfolio <onboarding@resend.dev>';
 const NOTIFY_EMAIL  = 'melvyn.cross05@gmail.com';
+
+// ── Add email to Resend Contacts audience (non-fatal if not configured) ──
+async function addToAudience(apiKey, email) {
+  const audienceId = process.env.RESEND_AUDIENCE_ID;
+  if (!audienceId) return; // silently skip if not configured
+  try {
+    await fetch(`${RESEND_CONTACTS_URL}/${audienceId}/contacts`, {
+      method:  'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, unsubscribed: false }),
+    });
+  } catch (err) {
+    // Non-fatal — welcome email still goes out
+    console.error('[subscribe] Contacts API error (non-fatal):', err.message);
+  }
+}
 
 const EMAIL_RE  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL = 254; // RFC 5321 max
@@ -152,7 +169,9 @@ export default async function handler(req, res) {
   const e = email.trim().toLowerCase();
 
   try {
+    // Persist to audience list + send emails concurrently
     await Promise.all([
+      addToAudience(apiKey, e),
       sendEmail(apiKey, {
         from:    FROM_SENDER,
         to:      e,
