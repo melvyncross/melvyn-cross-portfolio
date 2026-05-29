@@ -5,13 +5,23 @@
 
 // ── Page chrome hydration (hero title + description from Sanity) ─────────────
 import content from './content.js';
-(function () {
-  const s = content['en'];
+
+function applyChrome(lang) {
+  const s = content[lang] || content['en'];
+  if (!s) return;
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
-    if (s && s[key] != null && s[key] !== '') el.innerHTML = s[key];
+    if (s[key] != null && s[key] !== '') el.innerHTML = s[key];
   });
-})();
+}
+
+let chromeLang = localStorage.getItem('mc_lang') || 'en';
+applyChrome(chromeLang);
+
+document.getElementById('lang-toggle')?.addEventListener('click', () => {
+  chromeLang = chromeLang === 'en' ? 'fr' : 'en';
+  applyChrome(chromeLang);
+});
 
 const PROJECT_ID = 'p4gxllem';
 const DATASET    = 'production';

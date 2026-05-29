@@ -6,9 +6,8 @@
 
 import content from './content.js';
 
-(function () {
-  const lang = 'en'; // contact page is English-only
-  const strings = content[lang];
+function applyContent(lang) {
+  const strings = content[lang] || content['en'];
   if (!strings) return;
 
   // ── Plain text / HTML injection ──────────────────────────────────────────
@@ -20,19 +19,26 @@ import content from './content.js';
   });
 
   // ── Link href updates ─────────────────────────────────────────────────────
-  // Update email href if Sanity provides a value
   if (strings.cp_email) {
     const emailLink = document.querySelector('[data-cp-email]');
     if (emailLink) emailLink.href = `mailto:${strings.cp_email}`;
   }
-  // Update LinkedIn href
   if (strings.cp_linkedin_url) {
     const liLink = document.querySelector('[data-cp-linkedin]');
     if (liLink) liLink.href = strings.cp_linkedin_url;
   }
-  // Update phone href
   if (strings.cp_phone_url) {
     const phoneLink = document.querySelector('[data-cp-phone]');
     if (phoneLink) phoneLink.href = `tel:${strings.cp_phone_url}`;
   }
-})();
+}
+
+// Apply on load using stored preference
+let currentLang = localStorage.getItem('mc_lang') || 'en';
+applyContent(currentLang);
+
+// Re-apply when lang toggle is clicked
+document.getElementById('lang-toggle')?.addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'fr' : 'en';
+  applyContent(currentLang);
+});

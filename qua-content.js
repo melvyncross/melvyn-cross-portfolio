@@ -6,9 +6,8 @@
 
 import content from './content.js';
 
-(function () {
-  const lang = 'en'; // qualifications page is English-only
-  const strings = content[lang];
+function applyContent(lang) {
+  const strings = content[lang] || content['en'];
   if (!strings) return;
 
   // ── Plain text / HTML injection ──────────────────────────────────────────
@@ -20,7 +19,6 @@ import content from './content.js';
   });
 
   // ── Skill tag lists ───────────────────────────────────────────────────────
-  // Elements with data-skills="key" get rendered as <span class="qua-skill">.
   document.querySelectorAll('[data-skills]').forEach(el => {
     const key = el.dataset.skills;
     const raw = strings[key];
@@ -32,4 +30,14 @@ import content from './content.js';
       .map(s => `<span class="qua-skill">${s}</span>`)
       .join('');
   });
-})();
+}
+
+// Apply on load using stored preference
+let currentLang = localStorage.getItem('mc_lang') || 'en';
+applyContent(currentLang);
+
+// Re-apply when lang toggle is clicked
+document.getElementById('lang-toggle')?.addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'fr' : 'en';
+  applyContent(currentLang);
+});

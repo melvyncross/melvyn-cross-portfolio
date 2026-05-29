@@ -6,9 +6,8 @@
 
 import content from './content.js';
 
-(function () {
-  const lang = 'en'; // education page is English-only
-  const strings = content[lang];
+function applyContent(lang) {
+  const strings = content[lang] || content['en'];
   if (!strings) return;
 
   // ── Plain text / HTML injection ──────────────────────────────────────────
@@ -20,8 +19,6 @@ import content from './content.js';
   });
 
   // ── Module / tag lists ────────────────────────────────────────────────────
-  // Elements with data-modules="key" get their comma-separated value rendered
-  // as individual <span class="edu-tag"> elements.
   document.querySelectorAll('[data-modules]').forEach(el => {
     const key = el.dataset.modules;
     const raw = strings[key];
@@ -33,4 +30,14 @@ import content from './content.js';
       .map(m => `<span class="edu-tag">${m}</span>`)
       .join('');
   });
-})();
+}
+
+// Apply on load using stored preference
+let currentLang = localStorage.getItem('mc_lang') || 'en';
+applyContent(currentLang);
+
+// Re-apply when lang toggle is clicked
+document.getElementById('lang-toggle')?.addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'fr' : 'en';
+  applyContent(currentLang);
+});
