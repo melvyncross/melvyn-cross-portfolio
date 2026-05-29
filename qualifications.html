@@ -55,7 +55,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -123,7 +123,7 @@
         <div class="qua-card">
           <!-- Blurred cert -->
           <div class="qua-cert" aria-label="HubSpot Digital Marketing certificate — contact to obtain">
-            <img src="img/cert-hubspot.jpg" alt="HubSpot Digital Marketing Certified — Melvyn Cross" class="qua-cert__img" aria-hidden="true" />
+            <picture><source type="image/webp" srcset="img/cert-hubspot.webp"><img src="img/cert-hubspot.jpg" alt="HubSpot Digital Marketing Certified — Melvyn Cross" class="qua-cert__img" aria-hidden="true" loading="lazy" /></picture>
             <div class="qua-cert__overlay">
               <span class="qua-cert__lock" aria-hidden="true">🔒</span>
               <p class="qua-cert__note">Contact me to obtain a copy</p>
@@ -159,7 +159,7 @@
         <!-- ── GOOGLE ANALYTICS ── -->
         <div class="qua-card">
           <div class="qua-cert" aria-label="Google Analytics certificate — verify online">
-            <img src="img/cert-google-analytics.jpg" alt="Google Analytics Certification — Melvyn Cross" class="qua-cert__img" aria-hidden="true" />
+            <picture><source type="image/webp" srcset="img/cert-google-analytics.webp"><img src="img/cert-google-analytics.jpg" alt="Google Analytics Certification — Melvyn Cross" class="qua-cert__img" aria-hidden="true" loading="lazy" /></picture>
             <div class="qua-cert__overlay">
               <span class="qua-cert__lock" aria-hidden="true">🔒</span>
               <p class="qua-cert__note">Verify my credential online</p>
@@ -358,8 +358,8 @@
   </script>
   <script type="module" src="qua-content.js"></script>
   <script src="page-transition.js"></script>
-  <script src="cookie-consent.js"></script>
-  <script src="ftr-subscribe.js"></script>
+  <script defer src="cookie-consent.js"></script>
+  <script defer src="ftr-subscribe.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>

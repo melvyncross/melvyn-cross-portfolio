@@ -95,7 +95,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://p4gxllem.apicdn.sanity.io" crossorigin />
   <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
 
   <!-- Prevent flash of wrong theme — runs before CSS paints -->
   <script>(function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -172,13 +172,18 @@
       </div>
 
       <div class="hero__portrait" aria-label="Portrait of Melvyn Cross">
-        <img
-          src="img/portrait.jpg"
-          alt="Melvyn Cross"
-          class="hero__portrait-img"
-          data-i18n-alt="portrait_alt"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-        />
+        <picture>
+          <source type="image/webp" srcset="img/portrait.webp">
+          <img
+            src="img/portrait.jpg"
+            alt="Melvyn Cross"
+            class="hero__portrait-img"
+            data-i18n-alt="portrait_alt"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none';this.parentElement.nextElementSibling.style.display='flex';"
+          />
+        </picture>
         <div class="hero__portrait-placeholder">
           <div class="hero__portrait-inner">
             <span class="hero__portrait-icon">◎</span>
@@ -676,8 +681,8 @@
 
   <script type="module" src="script.js"></script>
   <script src="page-transition.js"></script>
-  <script src="cookie-consent.js"></script>
-  <script src="ftr-subscribe.js"></script>
+  <script defer src="cookie-consent.js"></script>
+  <script defer src="ftr-subscribe.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>

@@ -60,7 +60,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter+Tight:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -126,7 +126,7 @@
 
         <div class="edu-card__top">
           <!-- Badge -->
-          <img src="img/LOGO_ISG_2019_QUADRI.jpg" class="edu-badge edu-badge--logo" alt="ISG Paris" aria-hidden="true" />
+          <img src="img/LOGO_ISG_2019_QUADRI.jpg" class="edu-badge edu-badge--logo" alt="ISG Paris" aria-hidden="true" loading="lazy" />
 
           <div class="edu-card__header">
             <div class="edu-card__school-row">
@@ -203,7 +203,7 @@
       <article class="edu-card">
 
         <div class="edu-card__top">
-          <img src="img/Logo_IUT_Lens.svg.png" class="edu-badge edu-badge--logo" alt="IUT de Lens" aria-hidden="true" />
+          <img src="img/Logo_IUT_Lens.svg.png" class="edu-badge edu-badge--logo" alt="IUT de Lens" aria-hidden="true" loading="lazy" />
 
           <div class="edu-card__header">
             <div class="edu-card__school-row">
@@ -252,7 +252,7 @@
             </div>
 
             <div class="edu-diploma" aria-label="IUT de Lens diploma — contact to obtain a copy">
-              <img src="img/IUT DE LENS degree.jpeg" class="edu-diploma__img" alt="" aria-hidden="true" />
+              <picture><source type="image/webp" srcset="img/IUT-DE-LENS-degree.webp"><img src="img/IUT DE LENS degree.jpeg" class="edu-diploma__img" alt="" aria-hidden="true" loading="lazy" /></picture>
               <div class="edu-diploma__overlay">
                 <span class="edu-diploma__lock" aria-hidden="true">🔒</span>
                 <p class="edu-diploma__note">Contact me to obtain a copy</p>
@@ -414,8 +414,8 @@
   </script>
   <script type="module" src="edu-content.js"></script>
   <script src="page-transition.js"></script>
-  <script src="cookie-consent.js"></script>
-  <script src="ftr-subscribe.js"></script>
+  <script defer src="cookie-consent.js"></script>
+  <script defer src="ftr-subscribe.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
