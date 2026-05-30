@@ -136,6 +136,23 @@ function applyStaticLang(lang) {
   set('bk-stat-max',   s.stat_max);
 }
 
+// ── Rebind custom cursor hover on dynamically added elements ───────────────
+function rebindCursor() {
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  if (!dot || !ring) return;
+  document.querySelectorAll('.bk-grid a, .bk-grid button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      dot.classList.add('cursor-dot--hover');
+      ring.classList.add('cursor-ring--hover');
+    });
+    el.addEventListener('mouseleave', () => {
+      dot.classList.remove('cursor-dot--hover');
+      ring.classList.remove('cursor-ring--hover');
+    });
+  });
+}
+
 // ── Load books from Sanity ──────────────────────────────────────────────────
 async function load() {
   const grid     = document.getElementById('bk-grid');
@@ -181,6 +198,7 @@ async function load() {
   let currentLang = localStorage.getItem('mc_lang') || 'en';
   applyStaticLang(currentLang);
   grid.innerHTML = books.map(b => renderCard(b, currentLang)).join('');
+  rebindCursor();
 
   // ── Language toggle ─────────────────────────────────────────────────────
   const langBtn = document.getElementById('lang-toggle');
@@ -189,6 +207,7 @@ async function load() {
       currentLang = localStorage.getItem('mc_lang') || 'en';
       applyStaticLang(currentLang);
       grid.innerHTML = books.map(b => renderCard(b, currentLang)).join('');
+      rebindCursor();
     });
   }
 }
