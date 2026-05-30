@@ -2,3 +2,9 @@
 .env*
 .DS_Store
 node_modules/
+
+# Raw source images (originals — WebP processed versions are committed instead)
+img/melvyn planetsoarshop images/
+img/Hubspot certification.png
+*.HEIC
+*.heic
