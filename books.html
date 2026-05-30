@@ -194,6 +194,46 @@
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
   <script>
+    // ── Theme ──
+    (function(){
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      const set = t => {
+        document.documentElement.setAttribute('data-theme', t);
+        btn.textContent = t === 'dark' ? '☀' : '☽';
+        localStorage.setItem('mc_theme', t);
+      };
+      set(document.documentElement.getAttribute('data-theme') || 'light');
+      btn.addEventListener('click', () =>
+        set(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+    })();
+
+    // ── Custom cursor ──
+    (function(){
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const dot = document.querySelector('.cursor-dot');
+      const ring = document.querySelector('.cursor-ring');
+      if (!dot || !ring) return;
+      let mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,visible=false;
+      document.addEventListener('mousemove', e => {
+        mX=e.clientX; mY=e.clientY;
+        if (!visible) { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); visible=true; }
+      });
+      document.addEventListener('mouseleave', () => { dot.classList.add('cursor-dot--hidden'); ring.classList.add('cursor-ring--hidden'); dot.classList.remove('cursor-dot--visible'); ring.classList.remove('cursor-ring--visible'); visible=false; });
+      document.addEventListener('mouseenter', () => { dot.classList.add('cursor-dot--visible'); ring.classList.add('cursor-ring--visible'); dot.classList.remove('cursor-dot--hidden'); ring.classList.remove('cursor-ring--hidden'); visible=true; });
+      document.addEventListener('mousedown', () => {
+        const r=document.createElement('div'); r.className='cursor-ripple'; r.style.left=mX+'px'; r.style.top=mY+'px';
+        document.body.appendChild(r); r.addEventListener('animationend',()=>r.remove(),{once:true});
+      });
+      document.querySelectorAll('a,button,[role="button"]').forEach(el => {
+        el.addEventListener('mouseenter',()=>{ dot.classList.add('cursor-dot--hover'); ring.classList.add('cursor-ring--hover'); });
+        el.addEventListener('mouseleave',()=>{ dot.classList.remove('cursor-dot--hover'); ring.classList.remove('cursor-ring--hover'); });
+      });
+      const tick=()=>{ dX+=(mX-dX)*0.15; dY+=(mY-dY)*0.15; rX+=(mX-rX)*0.065; rY+=(mY-rY)*0.065; dot.style.transform=`translate(${dX}px,${dY}px) translate(-50%,-50%)`; ring.style.transform=`translate(${rX}px,${rY}px) translate(-50%,-50%)`; requestAnimationFrame(tick); };
+      tick();
+    })();
+
     // ── Language toggle (syncs label from stored preference) ──
     (function(){
       var btn = document.getElementById('lang-toggle');
