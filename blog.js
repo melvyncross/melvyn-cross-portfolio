@@ -13,6 +13,12 @@ function applyChrome(lang) {
     const key = el.dataset.i18n;
     if (s[key] != null && s[key] !== '') el.innerHTML = s[key];
   });
+
+  // Editorial section + label
+  const ed = document.getElementById('bl-editorial');
+  if (ed && s.bl_editorial) ed.innerHTML = s.bl_editorial;
+  const edLabel = document.getElementById('bl-editorial-label');
+  if (edLabel) edLabel.textContent = lang === 'fr' ? 'Pourquoi j’écris ces articles' : 'Why I write this';
 }
 
 let chromeLang = localStorage.getItem('mc_lang') || 'en';

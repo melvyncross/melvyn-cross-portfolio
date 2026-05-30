@@ -30,6 +30,12 @@ function applyContent(lang) {
       .map(s => `<span class="qua-skill">${s}</span>`)
       .join('');
   });
+
+  // ── Editorial section + label ─────────────────────────────────────────────
+  const ed = document.getElementById('qua-editorial');
+  if (ed && strings.qua_editorial) ed.innerHTML = strings.qua_editorial;
+  const edLabel = document.getElementById('qua-editorial-label');
+  if (edLabel) edLabel.textContent = lang === 'fr' ? 'Pourquoi c’est important' : 'Why this matters';
 }
 
 // Apply on load using stored preference

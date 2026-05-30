@@ -4529,3 +4529,64 @@ html { scroll-behavior: smooth; }
   .pt-hero__title { font-size: 1.7rem; }
   .bk-hero__stat-num { font-size: 1.6rem; }
 }
+
+/* ============================================================
+   EDITORIAL SECTION — blog, education, qualifications
+   Shared rich-text closing section, bilingual via JS
+   ============================================================ */
+.editorial-section {
+  padding: clamp(4rem, 8vw, 7rem) var(--pad-x);
+  background: var(--cream);
+  border-top: 1px solid var(--rule);
+}
+[data-theme="dark"] .editorial-section {
+  background: #0f1a2b;
+  border-top-color: rgba(245,237,224,0.07);
+}
+.editorial-section__inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.editorial-section__label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 1.5rem;
+}
+.editorial-section__body p {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: -0.005em;
+  color: var(--paper-text);
+  margin: 0 0 1.4em;
+}
+[data-theme="dark"] .editorial-section__body p {
+  color: rgba(245,237,224,0.78);
+}
+.editorial-section__body p:last-child { margin-bottom: 0; }
+.editorial-section__body strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+[data-theme="dark"] .editorial-section__body strong { color: var(--cream); }
+.editorial-section__body em {
+  font-style: italic;
+  color: var(--amber);
+}
+.editorial-section__body a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: opacity 0.2s ease;
+}
+.editorial-section__body a:hover { opacity: 0.75; }
+
+@media (max-width: 600px) {
+  .editorial-section { padding: 3rem var(--pad-x); }
+  .editorial-section__body p { font-size: 1rem; line-height: 1.65; }
+}

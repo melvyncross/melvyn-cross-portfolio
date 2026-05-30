@@ -30,6 +30,12 @@ function applyContent(lang) {
       .map(m => `<span class="edu-tag">${m}</span>`)
       .join('');
   });
+
+  // ── Editorial section + label ─────────────────────────────────────────────
+  const ed = document.getElementById('edu-editorial');
+  if (ed && strings.edu_editorial) ed.innerHTML = strings.edu_editorial;
+  const edLabel = document.getElementById('edu-editorial-label');
+  if (edLabel) edLabel.textContent = lang === 'fr' ? 'Avec mes mots' : 'In my own words';
 }
 
 // Apply on load using stored preference

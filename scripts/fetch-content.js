@@ -68,6 +68,36 @@ async function main() {
   const locFrom = (d, field, lang) => (d && d[field] && d[field][lang]) != null
     ? d[field][lang]
     : '';
+
+  // Helper: convert Portable Text blocks to safe HTML (paragraphs + basic marks)
+  function blocksToHtml(blocks) {
+    if (!Array.isArray(blocks) || blocks.length === 0) return '';
+    return blocks
+      .filter(b => b._type === 'block')
+      .map(block => {
+        const inner = (block.children || []).map(span => {
+          let text = (span.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          const marks = span.marks || [];
+          if (marks.includes('strong')) text = `<strong>${text}</strong>`;
+          if (marks.includes('em'))     text = `<em>${text}</em>`;
+          // Handle link annotations
+          const linkMark = marks.find(m => typeof m === 'string' && m.length > 10);
+          if (linkMark && block.markDefs) {
+            const def = block.markDefs.find(d => d._key === linkMark);
+            if (def?.href) text = `<a href="${def.href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+          }
+          return text;
+        }).join('');
+        return `<p>${inner}</p>`;
+      })
+      .join('');
+  }
+
+  // Helper: get editorial HTML for a given doc and lang
+  const editorial = (d, lang) => {
+    if (!d || !d.editorial || !d.editorial[lang]) return '';
+    return blocksToHtml(d.editorial[lang]);
+  };
   // Convenience wrappers per document
   const loc    = (field, lang) => locFrom(doc, field, lang);
   const edu    = (field, lang) => locFrom(eduDoc, field, lang);
@@ -220,6 +250,11 @@ const content = {
     /* ── BLOG PAGE ── */
     bl_hero_title: ${JSON.stringify(bl('bl_hero_title', 'en'))},
     bl_hero_desc: ${JSON.stringify(bl('bl_hero_desc', 'en'))},
+
+    /* ── EDITORIAL SECTIONS ── */
+    bl_editorial: ${JSON.stringify(editorial(blDoc, 'en'))},
+    edu_editorial: ${JSON.stringify(editorial(eduDoc, 'en'))},
+    qua_editorial: ${JSON.stringify(editorial(quaDoc, 'en'))},
   },
 
   fr: {
@@ -357,6 +392,11 @@ const content = {
     /* ── BLOG PAGE ── */
     bl_hero_title: ${JSON.stringify(bl('bl_hero_title', 'fr'))},
     bl_hero_desc: ${JSON.stringify(bl('bl_hero_desc', 'fr'))},
+
+    /* ── EDITORIAL SECTIONS ── */
+    bl_editorial: ${JSON.stringify(editorial(blDoc, 'fr'))},
+    edu_editorial: ${JSON.stringify(editorial(eduDoc, 'fr'))},
+    qua_editorial: ${JSON.stringify(editorial(quaDoc, 'fr'))},
   },
 };
 

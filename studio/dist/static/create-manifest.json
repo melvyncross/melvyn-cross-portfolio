@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "createdAt": "2026-05-30T06:25:05.655Z",
+  "createdAt": "2026-05-30T13:22:21.114Z",
   "workspaces": [
     {
       "name": "melvyn-cross-portfolio",
@@ -12,7 +12,7 @@
       "mediaLibrary": {
         "enabled": false
       },
-      "schema": "f344f7ac.create-schema.json",
+      "schema": "79fd5bf8.create-schema.json",
       "tools": "e523f8b0.create-tools.json"
     }
   ]

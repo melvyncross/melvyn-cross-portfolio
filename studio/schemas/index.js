@@ -1,4 +1,4 @@
-import { localizedString, localizedText } from './localizedString.js';
+import { localizedString, localizedText, localizedPortableText } from './localizedString.js';
 import { portfolioContent } from './portfolioContent.js';
 import { educationContent } from './educationContent.js';
 import { qualificationsContent } from './qualificationsContent.js';
@@ -10,6 +10,7 @@ import { book } from './book.js';
 export const schemaTypes = [
   localizedString,
   localizedText,
+  localizedPortableText,
   portfolioContent,
   educationContent,
   qualificationsContent,

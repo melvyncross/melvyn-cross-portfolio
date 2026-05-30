@@ -21,6 +21,14 @@ export const blogPageContent = {
       type: 'localizedText',
       description: 'Short paragraph below the title.',
     },
+
+    // ── EDITORIAL SECTION ─────────────────────────────────────────────────
+    {
+      name: 'editorial',
+      title: 'Editorial Section — Why I write these articles',
+      type: 'localizedPortableText',
+      description: 'Rich text shown below all articles. Explain your passion for the topics and why you follow them closely.',
+    },
   ],
 
   preview: {

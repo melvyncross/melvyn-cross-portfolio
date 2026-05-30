@@ -23,3 +23,61 @@ export const localizedText = {
     { name: 'fr', title: '🇫🇷 French', type: 'text', rows: 3 },
   ],
 };
+
+// localizedPortableText → rich text (WYSIWYG) with bold, italic, links — EN + FR
+export const localizedPortableText = {
+  name: 'localizedPortableText',
+  title: 'Localized Rich Text',
+  type: 'object',
+  options: { collapsible: true, collapsed: false },
+  fields: [
+    {
+      name: 'en',
+      title: '🇬🇧 English',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [{ title: 'Normal', value: 'normal' }],
+          lists:  [],
+          marks: {
+            decorators: [
+              { title: 'Bold',   value: 'strong' },
+              { title: 'Italic', value: 'em' },
+            ],
+            annotations: [
+              {
+                name: 'link', type: 'object', title: 'Link',
+                fields: [{ name: 'href', type: 'url', title: 'URL' }],
+              },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      name: 'fr',
+      title: '🇫🇷 French',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [{ title: 'Normal', value: 'normal' }],
+          lists:  [],
+          marks: {
+            decorators: [
+              { title: 'Bold',   value: 'strong' },
+              { title: 'Italic', value: 'em' },
+            ],
+            annotations: [
+              {
+                name: 'link', type: 'object', title: 'Link',
+                fields: [{ name: 'href', type: 'url', title: 'URL' }],
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+};

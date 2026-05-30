@@ -150,6 +150,14 @@ export const educationContent = {
       title: 'GSS — Description paragraph',
       type: 'localizedText',
     },
+
+    // ── EDITORIAL SECTION ─────────────────────────────────────────────────
+    {
+      name: 'editorial',
+      title: 'Editorial Section — Your education story in your own words',
+      type: 'localizedPortableText',
+      description: 'Rich text shown below all education cards. Personal explanation of your timeline and what each step meant.',
+    },
   ],
 
   preview: {

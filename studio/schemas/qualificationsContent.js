@@ -109,6 +109,14 @@ export const qualificationsContent = {
       type: 'localizedText',
       description: 'e.g. Project Planning, Risk Management, Agile / Scrum',
     },
+
+    // ── EDITORIAL SECTION ─────────────────────────────────────────────────
+    {
+      name: 'editorial',
+      title: 'Editorial Section — Why certifications matter to you',
+      type: 'localizedPortableText',
+      description: 'Rich text shown below all qualification cards. Explain why you pursue certifications and how they improve your career and work ethic.',
+    },
   ],
 
   preview: {
