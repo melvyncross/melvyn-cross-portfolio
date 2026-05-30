@@ -136,7 +136,13 @@
       <a href="#s06" class="nav__chapter" data-for="06">IV</a>
       <a href="#s07" class="nav__chapter" data-for="07">V</a>
     </div>
-    <div class="nav__meta">
+    <button class="nav__hamburger" id="nav-hamburger" aria-label="Open navigation menu" aria-expanded="false">
+    <span class="nav__hamburger-bar"></span>
+    <span class="nav__hamburger-bar"></span>
+    <span class="nav__hamburger-bar"></span>
+  </button>
+  <div class="nav__backdrop" id="nav-backdrop"></div>
+  <div class="nav__meta">
       <span class="nav__location" data-i18n="nav_location"><span class="nav__dot"></span>Lille</span>
       <span class="nav__year">2026</span>
       <a href="/contact" class="nav__contact-cta">Contact me</a>
@@ -688,6 +694,32 @@
   <script defer src="cookie-consent.js"></script>
   <script defer src="ftr-subscribe.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/insights/script.js">
+    // ── Mobile navigation hamburger ──
+    (function(){
+      var nav = document.querySelector('.nav');
+      var hamburger = document.getElementById('nav-hamburger');
+      var backdrop = document.getElementById('nav-backdrop');
+      if (!hamburger || !nav) return;
+      function openMenu() {
+        nav.classList.add('nav--open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('nav-open');
+      }
+      function closeMenu() {
+        nav.classList.remove('nav--open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('nav-open');
+      }
+      hamburger.addEventListener('click', function() {
+        nav.classList.contains('nav--open') ? closeMenu() : openMenu();
+      });
+      if (backdrop) backdrop.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && nav.classList.contains('nav--open')) closeMenu();
+      });
+      nav.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
+    })();
+  </script>
 </body>
 </html>

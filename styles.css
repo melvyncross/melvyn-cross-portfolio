@@ -1213,6 +1213,163 @@ select:focus-visible,
 .nav__lang:hover { opacity: 1; }
 .nav__lang:active { opacity: 0.3; }
 
+/* ── Touch target boost for small toggle buttons ── */
+@media (pointer: coarse) {
+  .nav__theme, .nav__lang {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .ftr__btn { min-height: 44px; }
+}
+
+/* ============================================================
+   MOBILE HAMBURGER NAVIGATION
+   ============================================================ */
+.nav__hamburger {
+  display: none;              /* hidden on desktop */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  pointer-events: auto;
+  flex-shrink: 0;
+  z-index: 310;
+  position: relative;
+}
+.nav__hamburger-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.3s var(--ease-out), opacity 0.2s ease;
+  transform-origin: center;
+}
+/* Animate to × when open */
+.nav--open .nav__hamburger-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav--open .nav__hamburger-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav--open .nav__hamburger-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile backdrop */
+.nav__backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 22, 40, 0.55);
+  z-index: 299;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.nav--open .nav__backdrop {
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  /* Show hamburger on mobile */
+  .nav__hamburger { display: flex; }
+  .nav__backdrop  { display: block; }
+
+  /* Nav layout on mobile: brand left, hamburger right */
+  .nav {
+    padding: 0.9rem var(--pad-x);
+    gap: 0;
+  }
+
+  /* Slide-in drawer for nav__meta */
+  .nav__meta {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100dvh;        /* dynamic viewport height avoids iOS toolbar issues */
+    height: 100vh;         /* fallback */
+    width: min(300px, 84vw);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 5rem 2rem 2.5rem;
+    background: var(--cream);
+    border-left: 1px solid rgba(10, 22, 40, 0.08);
+    transform: translateX(100%);
+    transition: transform 0.35s var(--ease-out);
+    z-index: 300;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: -8px 0 40px rgba(10, 22, 40, 0.15);
+  }
+  [data-theme="dark"] .nav__meta {
+    background: #0f1a2b;
+    border-left-color: rgba(245, 237, 224, 0.07);
+    box-shadow: -8px 0 40px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Opened state */
+  .nav--open .nav__meta {
+    transform: translateX(0);
+  }
+
+  /* Each item in drawer: thumb-friendly height */
+  .nav__meta .nav__blog-link,
+  .nav__meta .nav__contact-cta {
+    width: 100%;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(10, 22, 40, 0.07);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  [data-theme="dark"] .nav__meta .nav__blog-link,
+  [data-theme="dark"] .nav__meta .nav__contact-cta {
+    border-bottom-color: rgba(245, 237, 224, 0.08);
+  }
+  .nav__meta .nav__blog-link:hover  { opacity: 1; }
+  .nav__meta .nav__contact-cta {
+    color: var(--amber);
+    border-color: transparent;
+    border-bottom-color: rgba(244, 165, 71, 0.15);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    border-radius: 0;
+    background: none;
+    padding-left: 0;
+  }
+
+  /* Theme and lang in drawer: stack at the bottom */
+  .nav__meta .nav__theme,
+  .nav__meta .nav__lang {
+    margin-top: auto;
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    opacity: 0.7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav__meta .nav__theme { margin-top: 1.5rem; }
+
+  /* Prevent body scroll when nav open */
+  body.nav-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* Inner pages: hide blog-nav links that won't fit — they're in the drawer */
+  .blog-nav .nav__meta .nav__blog-link { display: flex; }
+}
+
 /* Chapter nav links */
 .nav__chapters {
   display: flex;
@@ -4259,4 +4416,87 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .exp-card { transition: none !important; }
   .exp-card__img-wrap img { transition: none !important; }
+}
+
+/* ============================================================
+   GLOBAL MOBILE — 375px–767px optimisations
+   ============================================================ */
+
+/* ── Prevent any horizontal overflow on all pages ── */
+@media (max-width: 767px) {
+  html, body { overflow-x: hidden; }
+
+  /* ── Section padding tightened on phones ── */
+  :root {
+    --section: clamp(3.5rem, 8vw, 8rem);
+    --pad-x:   clamp(1.25rem, 5vw, 2rem);
+  }
+
+  /* ── Hero (homepage) — tighter on phone ── */
+  .hero { padding: 3rem var(--pad-x) 7rem; }
+  .hero__title { font-size: clamp(3.2rem, 13vw, 7rem); line-height: 0.95; }
+  .hero__label { margin-bottom: 2rem; font-size: 0.65rem; }
+  .hero__portrait { max-height: 40vw; }
+
+  /* ── Marquee: smaller text on phone ── */
+  .marquee__item { font-size: clamp(0.6rem, 2.5vw, 0.75rem); gap: 1rem; }
+
+  /* ── Number section ── */
+  .number { padding: clamp(3rem, 8vw, 6rem) var(--pad-x); }
+  .number__figure { font-size: clamp(3.5rem, 18vw, 8rem); }
+
+  /* ── Contact section on homepage ── */
+  .contact { padding: clamp(3rem, 8vw, 6rem) var(--pad-x); }
+  .contact__link { grid-template-columns: 1fr; gap: 0.2rem; }
+  .contact__label { font-size: 0.6rem; }
+  .contact__value { font-size: clamp(0.95rem, 4vw, 1.2rem); }
+
+  /* ── Blog listing hero ── */
+  .bl-hero { padding: 5rem var(--pad-x) 3rem; }
+  .bl-hero__title { font-size: clamp(2.2rem, 10vw, 4rem); }
+
+  /* ── Blog listing strip stats — wrap ── */
+  .bl-hero__strip, .bk-hero__strip,
+  .edu-hero__strip, .qua-hero__strip {
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+  }
+
+  /* ── Post page hero on smaller phones ── */
+  .pt-hero__left { padding: 4.5rem var(--pad-x) 2rem; }
+  .pt-hero__title { font-size: clamp(1.8rem, 7vw, 3rem); }
+
+  /* ── Contact page — contact links ── */
+  .cp-link { grid-template-columns: 6rem 1fr auto; gap: 0.75rem; padding: 1rem 0.5rem; }
+  .cp-link__value { font-size: 0.9rem; word-break: break-all; }
+
+  /* ── Education hero ── */
+  .edu-hero { padding: clamp(5rem, 10vw, 8rem) var(--pad-x) clamp(3rem, 6vw, 5rem); }
+  .edu-hero__title { font-size: clamp(2.4rem, 10vw, 4.5rem); }
+
+  /* ── Qualifications hero ── */
+  .qua-hero { padding: clamp(5rem, 10vw, 8rem) var(--pad-x) clamp(3rem, 6vw, 5rem); }
+
+  /* ── Experiences — lightbox close button ── */
+  .exp-lb__x { width: 44px; height: 44px; font-size: 1.5rem; }
+  .exp-lb__nav { width: 44px; height: 44px; }
+
+  /* ── Books hero ── */
+  .bk-hero { padding: clamp(5rem, 10vw, 8rem) var(--pad-x) clamp(2.5rem, 5vw, 4rem); }
+
+  /* ── Footer form on mobile ── */
+  .ftr__form { flex-direction: column; gap: 0.75rem; }
+  .ftr__input, .ftr__btn { width: 100%; }
+  .ftr__btn { min-height: 48px; }
+
+  /* ── Testimonial section ── */
+  .tst { padding: clamp(3rem, 8vw, 5rem) var(--pad-x); }
+  .tst__quote { font-size: clamp(1rem, 3.5vw, 1.2rem); }
+}
+
+/* ── Very small phones (≤ 375px) ── */
+@media (max-width: 375px) {
+  .nav__mark { font-size: 1.2rem; }
+  .pt-hero__title { font-size: 1.7rem; }
+  .bk-hero__stat-num { font-size: 1.6rem; }
 }

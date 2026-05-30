@@ -158,7 +158,13 @@
   <!-- Nav -->
   <nav class="nav blog-nav">
     <a href="/" class="nav__mark">MC</a>
-    <div class="nav__meta">
+    <button class="nav__hamburger" id="nav-hamburger" aria-label="Open navigation menu" aria-expanded="false">
+    <span class="nav__hamburger-bar"></span>
+    <span class="nav__hamburger-bar"></span>
+    <span class="nav__hamburger-bar"></span>
+  </button>
+  <div class="nav__backdrop" id="nav-backdrop"></div>
+  <div class="nav__meta">
       <a href="/contact" target="_blank" rel="noopener noreferrer" class="nav__contact-cta">Contact me</a>
       <a href="/qualifications" class="nav__blog-link">My qualifications</a>
       <a href="/experiences" class="nav__blog-link">In the field</a>
@@ -282,7 +288,34 @@
   <script>
     (function(){var t=localStorage.getItem('mc_theme')||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);var btn=document.getElementById('theme-toggle');if(btn){btn.textContent=t==='dark'?'☀':'☽';btn.addEventListener('click',function(){t=t==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);btn.textContent=t==='dark'?'☀':'☽';localStorage.setItem('mc_theme',t);});}})();
     (function(){if(!window.matchMedia('(pointer:fine)').matches)return;if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;var dot=document.querySelector('.cursor-dot'),ring=document.querySelector('.cursor-ring');if(!dot||!ring)return;var mX=0,mY=0,dX=0,dY=0,rX=0,rY=0,vis=false;document.addEventListener('mousemove',function(e){mX=e.clientX;mY=e.clientY;if(!vis){dot.classList.add('cursor-dot--visible');ring.classList.add('cursor-ring--visible');vis=true;}});document.querySelectorAll('a,button').forEach(function(el){el.addEventListener('mouseenter',function(){dot.classList.add('cursor-dot--hover');ring.classList.add('cursor-ring--hover');});el.addEventListener('mouseleave',function(){dot.classList.remove('cursor-dot--hover');ring.classList.remove('cursor-ring--hover');});});(function tick(){dX+=(mX-dX)*0.15;dY+=(mY-dY)*0.15;rX+=(mX-rX)*0.065;rY+=(mY-rY)*0.065;dot.style.transform='translate('+dX+'px,'+dY+'px) translate(-50%,-50%)';ring.style.transform='translate('+rX+'px,'+rY+'px) translate(-50%,-50%)';requestAnimationFrame(tick);})();})();
-    (function(){var btn=document.getElementById('lang-toggle');if(!btn)return;var lang=localStorage.getItem('mc_lang')||'en';btn.textContent=lang==='en'?'FR':'EN';btn.addEventListener('click',function(){lang=lang==='en'?'fr':'en';localStorage.setItem('mc_lang',lang);document.documentElement.lang=lang;btn.textContent=lang==='en'?'FR':'EN';});})();
+    (function(){
+    // ── Mobile navigation hamburger ──
+    (function(){
+      var nav = document.querySelector('.nav');
+      var hamburger = document.getElementById('nav-hamburger');
+      var backdrop = document.getElementById('nav-backdrop');
+      if (!hamburger || !nav) return;
+      function openMenu() {
+        nav.classList.add('nav--open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('nav-open');
+      }
+      function closeMenu() {
+        nav.classList.remove('nav--open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('nav-open');
+      }
+      hamburger.addEventListener('click', function() {
+        nav.classList.contains('nav--open') ? closeMenu() : openMenu();
+      });
+      if (backdrop) backdrop.addEventListener('click', closeMenu);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && nav.classList.contains('nav--open')) closeMenu();
+      });
+      nav.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
+    })();
+
+    var btn=document.getElementById('lang-toggle');if(!btn)return;var lang=localStorage.getItem('mc_lang')||'en';btn.textContent=lang==='en'?'FR':'EN';btn.addEventListener('click',function(){lang=lang==='en'?'fr':'en';localStorage.setItem('mc_lang',lang);document.documentElement.lang=lang;btn.textContent=lang==='en'?'FR':'EN';});})();
     document.getElementById('ftr-totop')?.addEventListener('click',function(e){e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});
   </script>
   <script src="page-transition.js"></script>
