@@ -1274,13 +1274,13 @@ select:focus-visible,
   transition: opacity 0.3s ease;
 }
 .nav--open .nav__backdrop {
+  display: block;   /* only rendered when menu is open */
   opacity: 1;
 }
 
 @media (max-width: 767px) {
-  /* Show hamburger on mobile */
+  /* Show hamburger on mobile; backdrop only appears when drawer is open (see nav--open rule) */
   .nav__hamburger { display: flex; }
-  .nav__backdrop  { display: block; }
 
   /* Nav layout on mobile: brand left, hamburger right */
   .nav {
