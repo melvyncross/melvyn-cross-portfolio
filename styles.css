@@ -4206,10 +4206,19 @@ html { scroll-behavior: smooth; }
   .bk-card--featured { grid-column: auto; }
 }
 @media (max-width: 540px) {
-  .bk-card { flex-direction: column; }
+  /* Stack every card vertically — including featured */
+  .bk-card,
+  .bk-card--featured { flex-direction: column; }
+  /* Cover spans full card width */
   .bk-card__cover-link,
   .bk-card--featured .bk-card__cover-link { width: 100%; }
-  .bk-card__cover-wrap { min-height: 220px; height: 220px; }
+  /* Portrait aspect ratio — DO NOT set height (it overrides aspect-ratio) */
+  .bk-card__cover-wrap,
+  .bk-card--featured .bk-card__cover-wrap {
+    aspect-ratio: 2 / 3;
+    height: auto;
+    min-height: unset;
+  }
   .bk-hero__strip { gap: 2rem; flex-wrap: wrap; }
 }
 
