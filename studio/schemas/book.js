@@ -75,6 +75,22 @@ export const book = {
       options: { layout: 'list' },
     },
     {
+      name: 'myThoughts_fr',
+      title: 'My Thoughts (French)',
+      type: 'text',
+      rows: 4,
+      description: 'French version of your thoughts — shown when the visitor selects FR.',
+      validation: (Rule) => Rule.max(600),
+    },
+    {
+      name: 'whatILearned_fr',
+      title: 'What I Learned (French)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'French translation of key takeaways — one bullet per entry.',
+      options: { layout: 'list' },
+    },
+    {
       name: 'featured',
       title: 'Featured',
       type: 'boolean',

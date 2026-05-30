@@ -3756,21 +3756,23 @@ html { scroll-behavior: smooth; }
   margin: 0 auto;
 }
 
-/* Grid */
+/* Grid — 3 columns desktop, 2 tablet, 1 mobile */
 .bk-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
 }
+@media (max-width: 900px) { .bk-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .bk-grid { grid-template-columns: 1fr; gap: 1.25rem; } }
 
-/* Card */
+/* Card — vertical layout: cover on top, body below */
 .bk-card {
   background: #fff;
   border: 1px solid rgba(10,22,40,0.07);
   border-radius: 4px;
   overflow: hidden;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   transition: box-shadow 0.3s var(--ease-out), transform 0.3s var(--ease-out);
 }
 [data-theme="dark"] .bk-card {
@@ -3778,36 +3780,44 @@ html { scroll-behavior: smooth; }
   border-color: rgba(245,237,224,0.07);
 }
 .bk-card:hover {
-  box-shadow: 0 8px 32px rgba(10,22,40,0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(10,22,40,0.12);
+  transform: translateY(-3px);
 }
 [data-theme="dark"] .bk-card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
 }
-.bk-card--featured { grid-column: 1 / -1; }
+/* Featured: span all 3 cols, go back to row layout for emphasis */
+.bk-card--featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+}
 
-/* Cover */
+/* Cover — full card width, portrait aspect ratio */
 .bk-card__cover-link {
   display: block;
-  flex-shrink: 0;
-  width: 140px;
+  width: 100%;
   text-decoration: none;
+  flex-shrink: 0;
 }
-.bk-card--featured .bk-card__cover-link { width: 190px; }
+.bk-card--featured .bk-card__cover-link { width: 260px; }
 .bk-card__cover-wrap {
   width: 100%;
-  height: 100%;
-  min-height: 200px;
+  aspect-ratio: 2 / 3;
   background: #e8e0ce;
   overflow: hidden;
   position: relative;
+}
+.bk-card--featured .bk-card__cover-wrap {
+  aspect-ratio: unset;
+  height: 100%;
+  min-height: 280px;
 }
 [data-theme="dark"] .bk-card__cover-wrap { background: #1a2942; }
 .bk-card__cover {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
   display: block;
   transition: transform 0.5s var(--ease-out);
 }
@@ -3833,7 +3843,7 @@ html { scroll-behavior: smooth; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem 1.5rem;
   min-width: 0;
 }
 .bk-card--featured .bk-card__body { padding: 2rem; }
