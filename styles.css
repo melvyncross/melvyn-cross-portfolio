@@ -1391,12 +1391,15 @@ select:focus-visible,
    * Fraunces display italic has extreme optical extents at large sizes.
    * The negative margin trick keeps line-spacing intact while the padding
    * expands the clip box so no ink is ever cut. Values are intentionally
-   * generous — 0.3em top (swash ascenders), 0.45em bottom (descenders).
+   * generous — 0.3em top (swash ascenders), 0.45em bottom (descenders),
+   * 0.2em right (italic slant of last character overhangs the right edge).
    */
   padding-top: 0.3em;
   margin-top: -0.3em;
   padding-bottom: 0.45em;
   margin-bottom: -0.45em;
+  padding-right: 0.2em;
+  margin-right: -0.2em;
 }
 .reveal-word__inner {
   display: inline-block;
