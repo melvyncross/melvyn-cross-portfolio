@@ -1250,10 +1250,13 @@ select:focus-visible,
   display: block;
   width: 22px;
   height: 2px;
-  background: currentColor;
+  background: var(--paper-text); /* dark ink in light mode */
   border-radius: 1px;
   transition: transform 0.3s var(--ease-out), opacity 0.2s ease;
   transform-origin: center;
+}
+[data-theme="dark"] .nav__hamburger-bar {
+  background: var(--cream); /* cream #F5EDE0 — always light, always visible on dark nav */
 }
 /* Animate to × when open */
 .nav--open .nav__hamburger-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
