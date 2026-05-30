@@ -2277,13 +2277,15 @@ html { scroll-behavior: smooth; }
   top: 0; left: 0; right: 0;
   height: 2px;
   background: transparent;
-  z-index: 200;
+  z-index: 201;          /* one above the nav so the line is always visible */
+  pointer-events: none;
 }
 .pt-progress__fill {
   height: 100%;
   width: 0%;
   background: var(--amber);
-  transition: width 0.08s linear;
+  transition: width 0.1s linear;
+  will-change: width;
 }
 
 /* ============================================================
