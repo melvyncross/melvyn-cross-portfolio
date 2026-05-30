@@ -1339,14 +1339,29 @@ select:focus-visible,
   }
   .nav__meta .nav__blog-link:hover  { opacity: 1; }
   .nav__meta .nav__contact-cta {
-    color: var(--amber);
-    border-color: transparent;
-    border-bottom-color: rgba(244, 165, 71, 0.15);
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    border-radius: 0;
-    background: none;
-    padding-left: 0;
+    /* Solid amber CTA button in the drawer */
+    background: var(--amber);
+    color: #0A1628;
+    border: none;
+    border-radius: 3px;
+    padding: 0 1.25rem;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    opacity: 1;
+    animation: none;
+    box-shadow: 0 2px 12px rgba(244, 165, 71, 0.25);
+  }
+  .nav__meta .nav__contact-cta::after {
+    content: '→';
+    font-size: 1rem;
+    line-height: 1;
+  }
+  [data-theme="dark"] .nav__meta .nav__contact-cta {
+    background: var(--amber);
+    color: #0A1628;
   }
 
   /* Theme and lang in drawer: stack at the bottom */
